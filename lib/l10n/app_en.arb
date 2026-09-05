@@ -1,0 +1,281 @@
+{
+  "@@locale": "en",
+  "appTitle": "Strawly - Menstrual Cycle Tracker",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "appName": "Strawly",
+  "homeSubtitle": "Your private cycle dashboard",
+  "navHome": "Home",
+  "navStats": "Stats",
+  "navSettings": "Settings",
+  "addCycleTooltip": "Add cycle",
+  "loadingPrediction": "Loading prediction",
+  "predictionError": "Prediction error",
+  "loadingCalendar": "Loading calendar",
+  "calendarError": "Calendar error",
+  "avgCycle": "Avg cycle",
+  "loadingAvgCycle": "Loading average cycle",
+  "regularity": "Regularity",
+  "loadingRegularity": "Loading regularity",
+  "recentCycles": "Recent cycles",
+  "ongoing": "Ongoing",
+  "lengthDays": "Length: {count} days",
+  "@lengthDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "avgCycleDays": "{value} days",
+  "@avgCycleDays": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "predictionUnavailable": "Prediction unavailable",
+  "noPredictionYet": "No prediction yet",
+  "addMoreCyclesForPrediction": "Add more cycles to unlock predictions.",
+  "nextPeriodPrediction": "Next period prediction",
+  "nextPeriod": "Next period",
+  "daysLeft": "{count, plural, =1{1 day left} other{{count} days left}}",
+  "@daysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "expectedToday": "Expected today",
+  "daysOverdue": "{count, plural, =1{1 day overdue} other{{count} days overdue}}",
+  "@daysOverdue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cycleCalendar": "Cycle calendar",
+  "legendPeriod": "Period",
+  "legendFertile": "Fertile",
+  "legendPredicted": "Predicted",
+  "periodDateRange": "Period date range",
+  "periodDates": "Period dates",
+  "periodDatesHint": "Tap the first bleeding day, then the last. Duration is calculated for you.",
+  "daysSelected": "{count, plural, =1{1 day selected} other{{count} days selected}}",
+  "@daysSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dateRange": "{start} – {end}",
+  "@dateRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "periodSelectFirstDay": "Select the first day of your period.",
+  "periodSelectLastDay": "Select the last day of your period.",
+  "periodOutOfRange": "Selected dates must be within the allowed range.",
+  "periodDurationRange": "Period should be between {min}–{max} days.",
+  "@periodDurationRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "addCycle": "Add cycle",
+  "editCycle": "Edit cycle",
+  "cycleEntryHelp": "Cycle entry help",
+  "cycleEntryHelpText": "Select your period on the calendar below. Cycle length is calculated when you add the next cycle.",
+  "cycleLength": "Cycle length",
+  "totalCycleLengthOptional": "Total cycle length (optional)",
+  "cycleLengthHint": "e.g., 28",
+  "daysSuffix": "days",
+  "enterValidNumber": "Enter a valid number",
+  "cycleLengthRange": "Length should be between {min}-{max} days",
+  "@cycleLengthRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "notesOptional": "Notes (optional)",
+  "notesHint": "Add notes about symptoms, mood, etc.",
+  "updateCycle": "Update cycle",
+  "cycleUpdatedSuccess": "Cycle updated successfully",
+  "cycleAddedSuccess": "Cycle added successfully",
+  "errorMessage": "Error: {message}",
+  "@errorMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings": "Settings",
+  "appearance": "Appearance",
+  "darkMode": "Dark mode",
+  "darkModeSubtitle": "Use dark theme for the app",
+  "language": "Language",
+  "languageSubtitle": "Choose app language and date format",
+  "languageSystem": "System default",
+  "languageEnglish": "English",
+  "languageVietnamese": "Tiếng Việt",
+  "dataManagement": "Data management",
+  "exportData": "Export data",
+  "exportDataSubtitle": "Backup your cycle data as JSON",
+  "importData": "Import data",
+  "importDataSubtitle": "Restore from backup file",
+  "deleteAllData": "Delete all data",
+  "deleteAllDataSubtitle": "Permanently delete all cycles",
+  "about": "About",
+  "aboutStrawly": "About Strawly",
+  "version": "Version",
+  "versionNumber": "1.0.0",
+  "privacy": "Privacy",
+  "privacySubtitle": "All data stored locally on device",
+  "security": "Security",
+  "securitySubtitle": "Data encrypted with AES-256",
+  "brandingSubtitle": "Your private menstrual cycle tracker",
+  "strawlyBranding": "Strawly branding",
+  "dataExported": "Data exported to clipboard",
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importDataTitle": "Import data",
+  "importDataConfirm": "This will replace all existing data. Make sure you have a backup first.\n\nPaste your backup JSON in the next step.",
+  "cancel": "Cancel",
+  "continueButton": "Continue",
+  "pasteBackupTitle": "Paste backup data",
+  "pasteBackupHint": "Paste your JSON backup here",
+  "importButton": "Import",
+  "importedCycles": "Successfully imported {count} cycles",
+  "@importedCycles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importFailed": "Import failed: {error}",
+  "@importFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAllDataTitle": "Delete all data?",
+  "deleteAllDataConfirm": "This will permanently delete all your cycle data. This action cannot be undone.\n\nMake sure you have exported your data first if you want to keep it.",
+  "deleteAllButton": "Delete all",
+  "allDataDeleted": "All data deleted",
+  "deleteFailed": "Delete failed: {error}",
+  "@deleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "statistics": "Statistics",
+  "statisticsError": "Statistics error",
+  "noStatisticsYet": "No statistics yet",
+  "noDataYet": "No data yet",
+  "addCyclesForInsights": "Add cycles to unlock insights and trends.",
+  "totalCycles": "Total cycles",
+  "complete": "Complete",
+  "stdDev": "Std dev",
+  "cycleLengthHistory": "Cycle length history",
+  "notEnoughChartData": "Not enough data to display chart.",
+  "lastNCycles": "Last {count} cycles",
+  "@lastNCycles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regularityScore": "Regularity score",
+  "deviationFromAverage": "Deviation from average",
+  "averageShort": "Avg",
+  "avgPeriod": "Avg period",
+  "shortestCycle": "Shortest cycle",
+  "longestCycle": "Longest cycle",
+  "currentCycleDay": "Current cycle day",
+  "currentCycleDayValue": "Day {day}",
+  "@currentCycleDayValue": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "shortestLongest": "Shortest / Longest",
+  "cycleLengthRange": "{short} - {long} days",
+  "@cycleLengthRange": {
+    "placeholders": {
+      "short": {
+        "type": "int"
+      },
+      "long": {
+        "type": "int"
+      }
+    }
+  },
+  "predictionReadyStatus": "Enough data to predict: {count} cycles",
+  "@predictionReadyStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cyclesRegular": "Your cycles are regular.",
+  "cyclesVariation": "Your cycles show some variation.",
+  "additionalInformation": "Additional information",
+  "completeCycles": "Complete cycles",
+  "standardDeviation": "Standard deviation",
+  "nextExpected": "Next expected",
+  "daysUnit": "{count} days",
+  "@daysUnit": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "somethingWentWrong": "Something went wrong",
+  "predictedNextPeriod": "Next expected period",
+  "daysLabel": "days",
+  "logPeriodToday": "Log period today",
+  "loggedPeriodToday": "Logged today",
+  "phasePeriod": "Period",
+  "phaseFollicular": "Follicular",
+  "phaseFertile": "Fertile window",
+  "phaseLuteal": "Luteal",
+  "periodLoggedSuccess": "Period logged — prediction updated"
+}

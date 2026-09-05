@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'core/di/hive_service.dart';
+import 'core/l10n/locale_support.dart';
 import 'core/theme/app_theme.dart';
-import 'presentation/screens/home_screen.dart';
+import 'l10n/app_localizations.dart';
+import 'presentation/shell/app_shell.dart';
+import 'presentation/viewmodels/locale_viewmodel.dart';
 import 'presentation/viewmodels/theme_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await initializeDateFormatting('en');
+  await initializeDateFormatting('vi');
   await HiveService.instance.init();
 
   runApp(const ProviderScope(child: MyApp()));
@@ -20,6 +26,8 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final localePreference = ref.watch(localePreferenceProvider);
+    final appLocale = LocaleSupport.materialLocaleFor(localePreference);
 
     return ShadApp.custom(
       themeMode: themeMode,
@@ -34,61 +42,23 @@ class MyApp extends ConsumerWidget {
                 ? AppTheme.darkTheme()
                 : AppTheme.lightTheme(),
           ),
-          home: const HomeScreen(),
+          darkTheme: AppTheme.getMaterialTheme(AppTheme.darkTheme()),
+          themeMode: themeMode,
+          locale: appLocale,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: LocaleSupport.supportedLocales,
+          localeListResolutionCallback: (locales, supportedLocales) {
+            return LocaleSupport.resolveLocale(
+              appLocale,
+              locales ?? const [Locale('en')],
+            );
+          },
+          home: const AppShell(),
           builder: (context, child) {
             return ShadAppBuilder(child: child!);
           },
         );
       },
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    //
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          //
-          //
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

@@ -3,14 +3,30 @@ import 'package:intl/intl.dart';
 class DateTimeUtils {
   DateTimeUtils._();
 
-  /// Format date to display format (e.g., "Jan 15, 2024")
-  static String formatDate(DateTime date) {
-    return DateFormat.yMMMd().format(date);
+  /// Format date to display format (e.g., "Jan 15, 2024" / "15 thg 1, 2024").
+  static String formatDate(DateTime date, [String? locale]) {
+    return DateFormat.yMMMd(locale).format(date);
   }
 
-  /// Format date to short format (e.g., "15/01/2024")
-  static String formatDateShort(DateTime date) {
-    return DateFormat.yMd().format(date);
+  /// Format date to short format (e.g., "15/01/2024" / "15/1/2024").
+  static String formatDateShort(DateTime date, [String? locale]) {
+    return DateFormat.yMd(locale).format(date);
+  }
+
+  /// Month and year header for calendars (e.g., "September 2026").
+  static String formatMonthYear(DateTime date, [String? locale]) {
+    return DateFormat('MMMM yyyy', locale).format(date);
+  }
+
+  /// Weekday labels starting Monday.
+  static List<String> weekdayLabels([String? locale]) {
+    final monday = DateTime(2024, 1, 1);
+    return List.generate(
+      7,
+      (index) => DateFormat.E(locale).format(
+        monday.add(Duration(days: index)),
+      ),
+    );
   }
 
   /// Get date without time

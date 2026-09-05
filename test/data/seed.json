@@ -1,0 +1,74 @@
+[
+  {
+    "id": "seed-2026-01-23",
+    "startDate": "2026-01-23T00:00:00.000",
+    "cycleLength": 28,
+    "periodDuration": 5,
+    "notes": "Chu kỳ đầu năm — ổn định",
+    "createdAt": "2026-01-23T08:00:00.000",
+    "updatedAt": "2026-01-23T08:00:00.000"
+  },
+  {
+    "id": "seed-2026-02-20",
+    "startDate": "2026-02-20T00:00:00.000",
+    "cycleLength": 28,
+    "periodDuration": 4,
+    "notes": null,
+    "createdAt": "2026-02-20T08:00:00.000",
+    "updatedAt": "2026-02-20T08:00:00.000"
+  },
+  {
+    "id": "seed-2026-03-20",
+    "startDate": "2026-03-20T00:00:00.000",
+    "cycleLength": 29,
+    "periodDuration": 5,
+    "notes": "Hơi căng bụng ngày 2",
+    "createdAt": "2026-03-20T08:00:00.000",
+    "updatedAt": "2026-03-20T08:00:00.000"
+  },
+  {
+    "id": "seed-2026-04-18",
+    "startDate": "2026-04-18T00:00:00.000",
+    "cycleLength": 29,
+    "periodDuration": 5,
+    "notes": null,
+    "createdAt": "2026-04-18T08:00:00.000",
+    "updatedAt": "2026-04-18T08:00:00.000"
+  },
+  {
+    "id": "seed-2026-05-17",
+    "startDate": "2026-05-17T00:00:00.000",
+    "cycleLength": 28,
+    "periodDuration": 4,
+    "notes": null,
+    "createdAt": "2026-05-17T08:00:00.000",
+    "updatedAt": "2026-05-17T08:00:00.000"
+  },
+  {
+    "id": "seed-2026-06-14",
+    "startDate": "2026-06-14T00:00:00.000",
+    "cycleLength": 31,
+    "periodDuration": 6,
+    "notes": "Chu kỳ dài hơn bình thường",
+    "createdAt": "2026-06-14T08:00:00.000",
+    "updatedAt": "2026-06-14T08:00:00.000"
+  },
+  {
+    "id": "seed-2026-07-15",
+    "startDate": "2026-07-15T00:00:00.000",
+    "cycleLength": 26,
+    "periodDuration": 5,
+    "notes": null,
+    "createdAt": "2026-07-15T08:00:00.000",
+    "updatedAt": "2026-07-15T08:00:00.000"
+  },
+  {
+    "id": "seed-2026-08-10",
+    "startDate": "2026-08-10T00:00:00.000",
+    "cycleLength": null,
+    "periodDuration": 5,
+    "notes": "Chu kỳ hiện tại — đang diễn ra",
+    "createdAt": "2026-08-10T08:00:00.000",
+    "updatedAt": "2026-09-06T08:00:00.000"
+  }
+]

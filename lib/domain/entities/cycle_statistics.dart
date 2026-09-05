@@ -9,6 +9,10 @@ class CycleStatistics extends Equatable {
   final DateTime? predictedNextStartDate;
   final int? daysUntilNextPeriod;
   final double? regularityScore; // 0-100, higher is more regular
+  final double? averagePeriodDuration;
+  final int? shortestCycleLength;
+  final int? longestCycleLength;
+  final int? currentCycleDay;
 
   const CycleStatistics({
     required this.averageCycleLength,
@@ -19,6 +23,10 @@ class CycleStatistics extends Equatable {
     this.predictedNextStartDate,
     this.daysUntilNextPeriod,
     this.regularityScore,
+    this.averagePeriodDuration,
+    this.shortestCycleLength,
+    this.longestCycleLength,
+    this.currentCycleDay,
   });
 
   @override
@@ -31,5 +39,9 @@ class CycleStatistics extends Equatable {
     predictedNextStartDate,
     daysUntilNextPeriod,
     regularityScore,
+    averagePeriodDuration,
+    shortestCycleLength,
+    longestCycleLength,
+    currentCycleDay,
   ];
 }

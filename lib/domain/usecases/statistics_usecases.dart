@@ -1,6 +1,7 @@
 import '../entities/cycle_statistics.dart';
 import '../repositories/cycle_repository.dart';
 import 'prediction_usecases.dart';
+import 'statistics_calculations.dart';
 
 class GetCycleStatisticsUseCase {
   final CycleRepository repository;
@@ -24,9 +25,11 @@ class GetCycleStatisticsUseCase {
   Future<CycleStatistics> call() async {
     final totalCycles = await repository.getTotalCount();
     final completeCycles = await repository.getCompleteCycles();
+    final allCycles = await repository.getAllCycles();
+    final latestCycle = await repository.getLatestCycle();
 
     if (totalCycles == 0) {
-      return CycleStatistics(
+      return const CycleStatistics(
         averageCycleLength: 0,
         standardDeviation: 0,
         totalCycles: 0,
@@ -54,6 +57,16 @@ class GetCycleStatisticsUseCase {
       predictedNextStartDate: predictedDate,
       daysUntilNextPeriod: daysUntil,
       regularityScore: regularityScore,
+      averagePeriodDuration: StatisticsCalculations.averagePeriodDuration(
+        allCycles,
+      ),
+      shortestCycleLength: StatisticsCalculations.shortestCycleLength(
+        completeCycles,
+      ),
+      longestCycleLength: StatisticsCalculations.longestCycleLength(
+        completeCycles,
+      ),
+      currentCycleDay: StatisticsCalculations.currentCycleDay(latestCycle),
     );
   }
 }

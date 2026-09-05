@@ -1,179 +1,234 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
+import '../../domain/entities/cycle.dart';
+import '../../l10n/app_localizations.dart';
+import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
+import '../widgets/bento_grid.dart';
+import '../widgets/bento_tile.dart';
 import '../widgets/cycle_calendar_widget.dart';
 import '../widgets/prediction_card_widget.dart';
 import 'add_cycle_screen.dart';
-import 'statistics_screen.dart';
-import 'settings_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+  void _openEditCycle(BuildContext context, WidgetRef ref, Cycle cycle) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.92,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return AddCycleScreen(
+              cycleToEdit: cycle,
+              scrollController: scrollController,
+              embeddedInSheet: true,
+              onSaved: () {
+                ref.read(cycleListProvider.notifier).loadCycles();
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
     final cycleListState = ref.watch(cycleListProvider);
     final predictedDate = ref.watch(predictedNextCycleDateProvider);
+    final statisticsAsync = ref.watch(cycleStatisticsProvider);
 
-    return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              floating: true,
-              expandedHeight: 80,
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text(
-                  'Strawly',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                BentoTokens.space16,
+                BentoTokens.space16,
+                BentoTokens.space16,
+                BentoTokens.space8,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.appName,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: BentoTokens.space4),
+                  Text(
+                    l10n.homeSubtitle,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: BentoTokens.mutedText(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: BentoGrid(
+              padding: const EdgeInsets.fromLTRB(
+                BentoTokens.space16,
+                0,
+                BentoTokens.space16,
+                BentoTokens.space96,
+              ),
+              items: [
+                BentoGridItem(
+                  columnSpan: 2,
+                  minHeight: 80,
+                  child: predictedDate.when(
+                    data: (date) => PredictionCardWidget(
+                      predictedDate: date,
+                      cycles: cycleListState.cycles,
+                      averageCycleLength: statisticsAsync.valueOrNull
+                              ?.averageCycleLength
+                              .round() ??
+                          AppConstants.defaultCycleLength,
+                    ),
+                    loading: () => BentoTile(
+                      label: l10n.loadingPrediction,
+                      isLoading: true,
+                      child: const SizedBox.shrink(),
+                    ),
+                    error: (error, _) => BentoTile(
+                      label: l10n.predictionError,
+                      isError: true,
+                      errorMessage: error.toString(),
+                      child: const SizedBox.shrink(),
+                    ),
                   ),
                 ),
-                centerTitle: true,
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.bar_chart, size: 20),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StatisticsScreen(),
-                      ),
-                    );
-                  },
+                BentoGridItem(
+                  columnSpan: 2,
+                  minHeight: 360,
+                  child: cycleListState.isLoading
+                      ? BentoTile(
+                          label: l10n.loadingCalendar,
+                          isLoading: true,
+                          child: const SizedBox.shrink(),
+                        )
+                      : cycleListState.error != null
+                      ? BentoTile(
+                          label: l10n.calendarError,
+                          isError: true,
+                          errorMessage: cycleListState.error,
+                          child: const SizedBox.shrink(),
+                        )
+                      : CycleCalendarWidget(
+                          cycles: cycleListState.cycles,
+                          predictedDate: predictedDate.value,
+                        ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.settings, size: 20),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SettingsScreen(),
+                if (cycleListState.cycles.isNotEmpty)
+                  BentoGridItem(
+                    columnSpan: 2,
+                    minHeight: 0,
+                    child: BentoTile(
+                      label: l10n.recentCycles,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ...cycleListState.cycles.take(5).map((cycle) {
+                            return Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BentoTokens.tileRadius,
+                                onTap: () =>
+                                    _openEditCycle(context, ref, cycle),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: BentoTokens.space8,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 16,
+                                        backgroundColor: BentoTokens.primary
+                                            .withValues(alpha: 0.35),
+                                        child: Icon(
+                                          Icons.calendar_today,
+                                          size: 14,
+                                          color: BentoTokens.onSurfaceText(
+                                            context,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: BentoTokens.space12,
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              DateTimeUtils.formatDate(
+                                                cycle.startDate,
+                                                locale,
+                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                            ),
+                                            Text(
+                                              cycle.isComplete
+                                                  ? l10n.lengthDays(
+                                                      cycle.cycleLength!,
+                                                    )
+                                                  : l10n.ongoing,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color: BentoTokens.mutedText(
+                                                      context,
+                                                    ),
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.chevron_right,
+                                        size: 20,
+                                        color: BentoTokens.mutedText(context),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
+                    ),
+                  ),
               ],
             ),
-
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    predictedDate.when(
-                      data: (date) => PredictionCardWidget(predictedDate: date),
-                      loading: () => const ShadCard(
-                        child: Padding(
-                          padding: EdgeInsets.all(24.0),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      ),
-                      error: (_, __) => const SizedBox.shrink(),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Text(
-                      'Calendar',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    if (cycleListState.isLoading)
-                      const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(48.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    else if (cycleListState.error != null)
-                      ShadCard(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
-                            'Error: ${cycleListState.error}',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      CycleCalendarWidget(
-                        cycles: cycleListState.cycles,
-                        predictedDate: predictedDate.value,
-                      ),
-
-                    const SizedBox(height: 24),
-
-                    if (cycleListState.cycles.isNotEmpty) ...[
-                      Text(
-                        'Recent Cycles',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ...cycleListState.cycles.take(5).map((cycle) {
-                        return ShadCard(
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.2),
-                              child: Icon(
-                                Icons.calendar_today,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 20,
-                              ),
-                            ),
-                            title: Text(
-                              DateTimeUtils.formatDate(cycle.startDate),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            subtitle: Text(
-                              cycle.isComplete
-                                  ? 'Length: ${cycle.cycleLength} days'
-                                  : 'Ongoing',
-                            ),
-                            trailing:
-                                cycle.notes != null && cycle.notes!.isNotEmpty
-                                ? const Icon(Icons.note, size: 16)
-                                : null,
-                          ),
-                        );
-                      }),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        label: const Text('Add Cycle'),
-        onPressed: () async {
-          final result = await Navigator.push<bool>(
-            context,
-            MaterialPageRoute(builder: (context) => const AddCycleScreen()),
-          );
-
-          if (result == true) {
-            ref.read(cycleListProvider.notifier).loadCycles();
-          }
-        },
+          ),
+        ],
       ),
     );
   }

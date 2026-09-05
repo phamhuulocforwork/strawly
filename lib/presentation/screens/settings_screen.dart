@@ -2,143 +2,238 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../core/di/providers.dart';
+import '../../core/l10n/locale_support.dart';
+import '../../l10n/app_localizations.dart';
+import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
+import '../viewmodels/locale_viewmodel.dart';
 import '../viewmodels/theme_viewmodel.dart';
+import '../widgets/bento_tile.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final themeMode = ref.watch(themeModeProvider);
+    final localePreference = ref.watch(localePreferenceProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.all(BentoTokens.space16),
         children: [
-          _buildSectionHeader(context, 'Appearance'),
-          Card(
-            child: SwitchListTile(
-              secondary: Icon(
-                themeMode == ThemeMode.dark
-                    ? Icons.dark_mode
-                    : Icons.light_mode,
-                color: Theme.of(context).colorScheme.primary,
+          SizedBox(
+            width: double.infinity,
+            child: Text(
+              l10n.settings,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          const SizedBox(height: BentoTokens.space16),
+          _buildSectionHeader(context, l10n.appearance),
+          BentoTile(
+            label: l10n.darkMode,
+            child: Material(
+              color: Colors.transparent,
+              child: SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  themeMode == ThemeMode.dark
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  color: BentoTokens.onSurfaceText(context),
+                ),
+                title: Text(l10n.darkMode),
+                subtitle: Text(l10n.darkModeSubtitle),
+                value: themeMode == ThemeMode.dark,
+                onChanged: (_) {
+                  ref.read(themeModeProvider.notifier).toggleTheme();
+                },
               ),
-              title: const Text('Dark Mode'),
-              subtitle: const Text('Use dark theme for the app'),
-              value: themeMode == ThemeMode.dark,
-              onChanged: (value) {
-                ref.read(themeModeProvider.notifier).toggleTheme();
-              },
             ),
           ),
-          const SizedBox(height: 24),
-
-          _buildSectionHeader(context, 'Data Management'),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.upload_file,
-                    color: Theme.of(context).colorScheme.primary,
+          const SizedBox(height: BentoTokens.space12),
+          BentoTile(
+            label: l10n.language,
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.language,
+                      color: BentoTokens.onSurfaceText(context),
+                    ),
+                    title: Text(l10n.language),
+                    subtitle: Text(l10n.languageSubtitle),
                   ),
-                  title: const Text('Export Data'),
-                  subtitle: const Text('Backup your cycle data as JSON'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _exportData(context, ref),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(
-                    Icons.download,
-                    color: Theme.of(context).colorScheme.primary,
+                  RadioListTile<LocalePreference>(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.languageSystem),
+                    value: LocalePreference.system,
+                    groupValue: localePreference,
+                    onChanged: (value) {
+                      if (value != null) {
+                        ref
+                            .read(localePreferenceProvider.notifier)
+                            .setPreference(value);
+                      }
+                    },
                   ),
-                  title: const Text('Import Data'),
-                  subtitle: const Text('Restore from backup file'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _importData(context, ref),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: const Text(
-                    'Delete All Data',
-                    style: TextStyle(color: Colors.red),
+                  RadioListTile<LocalePreference>(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.languageEnglish),
+                    value: LocalePreference.en,
+                    groupValue: localePreference,
+                    onChanged: (value) {
+                      if (value != null) {
+                        ref
+                            .read(localePreferenceProvider.notifier)
+                            .setPreference(value);
+                      }
+                    },
                   ),
-                  subtitle: const Text('Permanently delete all cycles'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _deleteAllData(context, ref),
-                ),
-              ],
+                  RadioListTile<LocalePreference>(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.languageVietnamese),
+                    value: LocalePreference.vi,
+                    groupValue: localePreference,
+                    onChanged: (value) {
+                      if (value != null) {
+                        ref
+                            .read(localePreferenceProvider.notifier)
+                            .setPreference(value);
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 24),
-
-          _buildSectionHeader(context, 'About'),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.info_outline,
-                    color: Theme.of(context).colorScheme.primary,
+          const SizedBox(height: BentoTokens.space24),
+          _buildSectionHeader(context, l10n.dataManagement),
+          BentoTile(
+            label: l10n.dataManagement,
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.upload_file,
+                      color: BentoTokens.onSurfaceText(context),
+                    ),
+                    title: Text(l10n.exportData),
+                    subtitle: Text(l10n.exportDataSubtitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _exportData(context, ref, l10n),
                   ),
-                  title: const Text('Version'),
-                  subtitle: const Text('1.0.0'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(
-                    Icons.privacy_tip_outlined,
-                    color: Theme.of(context).colorScheme.primary,
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.download,
+                      color: BentoTokens.onSurfaceText(context),
+                    ),
+                    title: Text(l10n.importData),
+                    subtitle: Text(l10n.importDataSubtitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _importData(context, ref, l10n),
                   ),
-                  title: const Text('Privacy'),
-                  subtitle: const Text('All data stored locally on device'),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(
-                    Icons.lock_outline,
-                    color: Theme.of(context).colorScheme.primary,
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(
+                      Icons.delete_forever,
+                      color: BentoTokens.danger,
+                    ),
+                    title: Text(
+                      l10n.deleteAllData,
+                      style: const TextStyle(color: BentoTokens.danger),
+                    ),
+                    subtitle: Text(l10n.deleteAllDataSubtitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _deleteAllData(context, ref, l10n),
                   ),
-                  title: const Text('Security'),
-                  subtitle: const Text('Data encrypted with AES-256'),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 24),
-
-          Center(
+          const SizedBox(height: BentoTokens.space24),
+          _buildSectionHeader(context, l10n.about),
+          BentoTile(
+            label: l10n.aboutStrawly,
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.info_outline,
+                      color: BentoTokens.onSurfaceText(context),
+                    ),
+                    title: Text(l10n.version),
+                    subtitle: Text(l10n.versionNumber),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.privacy_tip_outlined,
+                      color: BentoTokens.onSurfaceText(context),
+                    ),
+                    title: Text(l10n.privacy),
+                    subtitle: Text(l10n.privacySubtitle),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.lock_outline,
+                      color: BentoTokens.onSurfaceText(context),
+                    ),
+                    title: Text(l10n.security),
+                    subtitle: Text(l10n.securitySubtitle),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: BentoTokens.space24),
+          BentoTile(
+            label: l10n.strawlyBranding,
+            variant: BentoTileVariant.primary,
             child: Column(
               children: [
                 Icon(
                   Icons.favorite,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 48,
+                  color: BentoTokens.onSurfaceText(context),
+                  size: 40,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: BentoTokens.space8),
                 Text(
-                  'Strawly',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  l10n.appName,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: BentoTokens.space4),
                 Text(
-                  'Your private menstrual cycle tracker',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  l10n.brandingSubtitle,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: BentoTokens.mutedText(context),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: BentoTokens.space32),
         ],
       ),
     );
@@ -146,67 +241,76 @@ class SettingsScreen extends ConsumerWidget {
 
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      padding: const EdgeInsets.only(
+        left: BentoTokens.space4,
+        bottom: BentoTokens.space8,
+      ),
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.w700,
+          color: BentoTokens.mutedText(context),
         ),
       ),
     );
   }
 
-  Future<void> _exportData(BuildContext context, WidgetRef ref) async {
+  Future<void> _exportData(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     try {
       final repository = await ref.read(cycleRepositoryProvider.future);
       final data = await repository.exportToJson();
-
       final jsonString = const JsonEncoder.withIndent('  ').convert(data);
 
       if (!context.mounted) return;
-
       await Clipboard.setData(ClipboardData(text: jsonString));
-
       if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Data exported to clipboard'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: Text(l10n.dataExported),
+          backgroundColor: BentoTokens.success,
         ),
       );
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Export failed: $e'),
-            backgroundColor: Colors.red,
+            content: Text(l10n.exportFailed(e.toString())),
+            backgroundColor: BentoTokens.danger,
           ),
         );
       }
     }
   }
 
-  Future<void> _importData(BuildContext context, WidgetRef ref) async {
+  Future<void> _importData(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Import Data'),
-        content: const Text(
-          'This will replace all existing data. Make sure you have a backup first.\n\nPaste your backup JSON in the next step.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final dialogL10n = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(dialogL10n.importDataTitle),
+          content: Text(dialogL10n.importDataConfirm),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(dialogL10n.cancel),
+            ),
+            ShadButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(dialogL10n.continueButton),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed != true || !context.mounted) return;
@@ -214,27 +318,30 @@ class SettingsScreen extends ConsumerWidget {
     final controller = TextEditingController();
     final jsonData = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Paste Backup Data'),
-        content: TextField(
-          controller: controller,
-          maxLines: 10,
-          decoration: const InputDecoration(
-            hintText: 'Paste your JSON backup here',
-            border: OutlineInputBorder(),
+      builder: (context) {
+        final dialogL10n = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(dialogL10n.pasteBackupTitle),
+          content: TextField(
+            controller: controller,
+            maxLines: 10,
+            decoration: InputDecoration(
+              hintText: dialogL10n.pasteBackupHint,
+              border: const OutlineInputBorder(),
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Import'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(dialogL10n.cancel),
+            ),
+            ShadButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: Text(dialogL10n.importButton),
+            ),
+          ],
+        );
+      },
     );
 
     if (jsonData == null || jsonData.isEmpty) return;
@@ -246,14 +353,13 @@ class SettingsScreen extends ConsumerWidget {
 
       final repository = await ref.read(cycleRepositoryProvider.future);
       await repository.importFromJson(cycles);
-
       ref.invalidate(cycleListProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Successfully imported ${cycles.length} cycles'),
-            backgroundColor: Colors.green,
+            content: Text(l10n.importedCycles(cycles.length)),
+            backgroundColor: BentoTokens.success,
           ),
         );
       }
@@ -261,37 +367,38 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Import failed: $e'),
-            backgroundColor: Colors.red,
+            content: Text(l10n.importFailed(e.toString())),
+            backgroundColor: BentoTokens.danger,
           ),
         );
       }
     }
   }
 
-  Future<void> _deleteAllData(BuildContext context, WidgetRef ref) async {
+  Future<void> _deleteAllData(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete All Data?'),
-        content: const Text(
-          'This will permanently delete all your cycle data. This action cannot be undone.\n\nMake sure you have exported your data first if you want to keep it.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+      builder: (context) {
+        final dialogL10n = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(dialogL10n.deleteAllDataTitle),
+          content: Text(dialogL10n.deleteAllDataConfirm),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(dialogL10n.cancel),
             ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete All'),
-          ),
-        ],
-      ),
+            ShadButton.destructive(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(dialogL10n.deleteAllButton),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed != true) return;
@@ -299,14 +406,13 @@ class SettingsScreen extends ConsumerWidget {
     try {
       final repository = await ref.read(cycleRepositoryProvider.future);
       await repository.deleteAllCycles();
-
       ref.invalidate(cycleListProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('All data deleted'),
-            backgroundColor: Colors.orange,
+          SnackBar(
+            content: Text(l10n.allDataDeleted),
+            backgroundColor: BentoTokens.warning,
           ),
         );
       }
@@ -314,8 +420,8 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Delete failed: $e'),
-            backgroundColor: Colors.red,
+            content: Text(l10n.deleteFailed(e.toString())),
+            backgroundColor: BentoTokens.danger,
           ),
         );
       }

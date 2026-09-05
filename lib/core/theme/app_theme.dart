@@ -1,28 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import '../../presentation/theme/bento_tokens.dart';
 
 class AppTheme {
   AppTheme._();
 
-  static const Color primaryLight = Color(0xFFF4A6B5);
-  static const Color primaryDark = Color(0xFFD97B8F);
-
-  static const Color secondaryLight = Color(0xFFB5E2F4);
-  static const Color secondaryDark = Color(0xFF7BB8D9);
-
-  static const Color accentLight = Color(0xFFE8D4F2);
-  static const Color accentDark = Color(0xFFC5A8D9);
+  static TextTheme _textTheme(Brightness brightness) {
+    final base = GoogleFonts.interTextTheme(
+      brightness == Brightness.dark
+          ? ThemeData.dark().textTheme
+          : ThemeData.light().textTheme,
+    );
+    return base.copyWith(
+      displayLarge: base.displayLarge?.copyWith(
+        fontSize: BentoTokens.font32,
+        fontWeight: FontWeight.w700,
+        color: brightness == Brightness.dark
+            ? BentoTokens.textDark
+            : BentoTokens.text,
+      ),
+      headlineSmall: base.headlineSmall?.copyWith(
+        fontSize: BentoTokens.font24,
+        fontWeight: FontWeight.w700,
+      ),
+      titleLarge: base.titleLarge?.copyWith(
+        fontSize: BentoTokens.font20,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: base.titleMedium?.copyWith(
+        fontSize: BentoTokens.font16,
+        fontWeight: FontWeight.w600,
+      ),
+      bodyLarge: base.bodyLarge?.copyWith(fontSize: BentoTokens.font16),
+      bodyMedium: base.bodyMedium?.copyWith(fontSize: BentoTokens.font14),
+      bodySmall: base.bodySmall?.copyWith(fontSize: BentoTokens.font12),
+      labelSmall: GoogleFonts.jetBrainsMono(
+        fontSize: BentoTokens.font12,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
 
   static ShadThemeData lightTheme() {
     return ShadThemeData(
       brightness: Brightness.light,
       colorScheme: const ShadSlateColorScheme.light(
-        primary: primaryLight,
-        secondary: secondaryLight,
-        background: Color(0xFFFFFBF7),
-        foreground: Color(0xFF2D2D2D),
+        primary: BentoTokens.primary,
+        secondary: BentoTokens.secondary,
+        background: BentoTokens.surface,
+        foreground: BentoTokens.text,
+        destructive: BentoTokens.danger,
       ),
-      radius: BorderRadius.circular(12),
+      radius: BentoTokens.tileRadius,
+      textTheme: ShadTextTheme(family: GoogleFonts.inter().fontFamily!),
     );
   }
 
@@ -30,31 +61,49 @@ class AppTheme {
     return ShadThemeData(
       brightness: Brightness.dark,
       colorScheme: const ShadSlateColorScheme.dark(
-        primary: primaryDark,
-        secondary: secondaryDark,
-        background: Color(0xFF1A1A1A),
-        foreground: Color(0xFFE8E8E8),
+        primary: BentoTokens.primaryDark,
+        secondary: BentoTokens.secondaryDark,
+        background: BentoTokens.surfaceDark,
+        foreground: BentoTokens.textDark,
+        destructive: BentoTokens.danger,
       ),
-      radius: BorderRadius.circular(12),
+      radius: BentoTokens.tileRadius,
+      textTheme: ShadTextTheme(family: GoogleFonts.inter().fontFamily!),
     );
   }
 
   static ThemeData getMaterialTheme(ShadThemeData shadTheme) {
+    final brightness = shadTheme.brightness;
     return ThemeData(
-      fontFamily: shadTheme.textTheme.family,
+      fontFamily: GoogleFonts.inter().fontFamily,
+      textTheme: _textTheme(brightness),
       colorScheme: ColorScheme(
-        brightness: shadTheme.brightness,
+        brightness: brightness,
         primary: shadTheme.colorScheme.primary,
-        onPrimary: shadTheme.colorScheme.primaryForeground,
+        onPrimary: BentoTokens.text,
         secondary: shadTheme.colorScheme.secondary,
-        onSecondary: shadTheme.colorScheme.secondaryForeground,
+        onSecondary: BentoTokens.text,
         error: shadTheme.colorScheme.destructive,
-        onError: shadTheme.colorScheme.destructiveForeground,
+        onError: Colors.white,
         surface: shadTheme.colorScheme.background,
         onSurface: shadTheme.colorScheme.foreground,
       ),
       scaffoldBackgroundColor: shadTheme.colorScheme.background,
-      brightness: shadTheme.brightness,
+      brightness: brightness,
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: brightness == Brightness.dark
+            ? BentoTokens.surfaceElevatedDark
+            : Colors.white,
+        indicatorColor: BentoTokens.primary.withValues(alpha: 0.35),
+        labelTextStyle: WidgetStatePropertyAll(
+          GoogleFonts.inter(fontSize: BentoTokens.font12),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: shadTheme.colorScheme.primary,
+        foregroundColor: BentoTokens.text,
+        elevation: 2,
+      ),
     );
   }
 }

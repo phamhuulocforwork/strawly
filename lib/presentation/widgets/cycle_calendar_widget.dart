@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../../domain/entities/cycle.dart';
+import '../../l10n/app_localizations.dart';
+import '../theme/bento_tokens.dart';
+import 'bento_tile.dart';
+import 'cycle_calendar_logic.dart';
+import 'dashed_cell_border.dart';
+import 'range_day_style.dart';
 
 class CycleCalendarWidget extends StatefulWidget {
-  final List<Cycle> cycles;
-  final DateTime? predictedDate;
-
   const CycleCalendarWidget({
     super.key,
     required this.cycles,
     this.predictedDate,
   });
+
+  final List<Cycle> cycles;
+  final DateTime? predictedDate;
 
   @override
   State<CycleCalendarWidget> createState() => _CycleCalendarWidgetState();
@@ -29,214 +33,235 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ShadCard(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  onPressed: () {
-                    setState(() {
-                      selectedMonth = DateTime(
-                        selectedMonth.year,
-                        selectedMonth.month - 1,
-                      );
-                    });
-                  },
-                ),
-                Text(
-                  '${_monthNames[selectedMonth.month - 1]} ${selectedMonth.year}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  onPressed: () {
-                    setState(() {
-                      selectedMonth = DateTime(
-                        selectedMonth.year,
-                        selectedMonth.month + 1,
-                      );
-                    });
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
 
-            _buildCalendar(context),
-
-            const SizedBox(height: 16),
-
-            _buildLegend(context),
-          ],
-        ),
+    return BentoTile(
+      label: l10n.cycleCalendar,
+      padding: const EdgeInsets.all(BentoTokens.space12),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: () {
+                  setState(() {
+                    selectedMonth = DateTime(
+                      selectedMonth.year,
+                      selectedMonth.month - 1,
+                    );
+                  });
+                },
+              ),
+              Text(
+                DateTimeUtils.formatMonthYear(selectedMonth, locale),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: () {
+                  setState(() {
+                    selectedMonth = DateTime(
+                      selectedMonth.year,
+                      selectedMonth.month + 1,
+                    );
+                  });
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: BentoTokens.space8),
+          _buildCalendar(context, locale),
+          const SizedBox(height: BentoTokens.space12),
+          _buildLegend(context, l10n),
+        ],
       ),
     );
   }
 
-  Widget _buildCalendar(BuildContext context) {
+  Widget _buildCalendar(BuildContext context, String locale) {
+    final weekDays = DateTimeUtils.weekdayLabels(locale);
     final firstDayOfMonth = DateTimeUtils.firstDayOfMonth(selectedMonth);
     final lastDayOfMonth = DateTimeUtils.lastDayOfMonth(selectedMonth);
     final daysInMonth = lastDayOfMonth.day;
-
     final firstWeekday = (firstDayOfMonth.weekday - 1) % 7;
 
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: _weekDays.map((day) {
+          children: weekDays.map((day) {
             return Expanded(
               child: Center(
                 child: Text(
                   day,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey,
+                    color: BentoTokens.mutedText(context),
                   ),
                 ),
               ),
             );
           }).toList(),
         ),
-        const SizedBox(height: 8),
-
+        const SizedBox(height: BentoTokens.space8),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 0,
           ),
           itemCount: firstWeekday + daysInMonth,
           itemBuilder: (context, index) {
-            if (index < firstWeekday) {}
+            if (index < firstWeekday) {
+              return const SizedBox.shrink();
+            }
 
             final day = index - firstWeekday + 1;
-            final date = DateTime(selectedMonth.year, selectedMonth.month, day);
+            final date = DateTime(
+              selectedMonth.year,
+              selectedMonth.month,
+              day,
+            );
+            final columnIndex = index % 7;
 
-            return _buildDayCell(context, date);
+            return _buildDayCell(context, date, columnIndex);
           },
         ),
       ],
     );
   }
 
-  Widget _buildDayCell(BuildContext context, DateTime date) {
+  Widget _buildDayCell(BuildContext context, DateTime date, int columnIndex) {
     final isToday = DateTimeUtils.isToday(date);
-    final cycleType = _getCycleTypeForDate(date);
+    final kind = CycleCalendarLogic.kindFor(
+      date,
+      cycles: widget.cycles,
+      predictedDate: widget.predictedDate,
+    );
+    final span = CycleCalendarLogic.spanFor(
+      date,
+      cycles: widget.cycles,
+      predictedDate: widget.predictedDate,
+    );
 
+    RangeDayRole role = RangeDayRole.none;
     Color? bgColor;
     Color? textColor;
+    var isPeakFertile = false;
 
-    switch (cycleType) {
-      case _CycleType.period:
-        bgColor = Theme.of(context).colorScheme.primary;
-        textColor = Colors.white;
-        break;
-      case _CycleType.fertile:
-        bgColor = Theme.of(
-          context,
-        ).colorScheme.secondary.withValues(alpha: 0.3);
-        break;
-      case _CycleType.predicted:
-        bgColor = Colors.orange.withValues(alpha: 0.2);
-        break;
-      case _CycleType.none:
-        break;
+    if (kind == CalendarDayKind.fertile) {
+      textColor = _fertileTextColor(context);
+      isPeakFertile = CycleCalendarLogic.isPeakFertilityDay(
+        date,
+        cycles: widget.cycles,
+      );
+    } else if (span != null && kind != CalendarDayKind.none) {
+      role = RangeDayStyle.roleForRange(
+        date: date,
+        rangeStart: span.start,
+        rangeEnd: span.end,
+      );
+      bgColor = RangeDayStyle.backgroundForRole(
+        role,
+        accentColor: _accentForKind(kind),
+        middleAlpha: kind == CalendarDayKind.period ? 0.4 : 1,
+        uniformFill: true,
+      );
+      textColor = RangeDayStyle.textColorForRole(role, context);
     }
 
-    if (isToday && bgColor == null) {
-      bgColor = Theme.of(context).colorScheme.primary.withValues(alpha: 0.1);
+    if (isToday && bgColor == null && kind != CalendarDayKind.fertile) {
+      bgColor = BentoTokens.primary.withValues(alpha: 0.2);
     }
 
-    return Container(
+    final radius = kind == CalendarDayKind.fertile
+        ? BorderRadius.circular(BentoTokens.radiusMd)
+        : RangeDayStyle.radiusForCell(
+            role: role,
+            columnIndex: columnIndex,
+            isToday: isToday,
+          );
+
+    final cell = Container(
+      height: 40,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: bgColor,
-        shape: BoxShape.circle,
-        border: isToday
-            ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
+        borderRadius: radius,
+        border: isToday && kind == CalendarDayKind.none
+            ? Border.all(color: BentoTokens.primary, width: 2)
             : null,
       ),
-      child: Center(
-        child: Text(
-          date.day.toString(),
-          style: TextStyle(
-            color:
-                textColor ??
-                (isToday ? Theme.of(context).colorScheme.primary : null),
-            fontWeight: isToday ? FontWeight.bold : null,
-            fontSize: 14,
-          ),
+      child: Text(
+        date.day.toString(),
+        style: TextStyle(
+          color: textColor ?? BentoTokens.onSurfaceText(context),
+          fontWeight: isToday || isPeakFertile
+              ? FontWeight.bold
+              : FontWeight.w500,
+          fontSize: BentoTokens.font14,
+          decoration: isToday ? TextDecoration.underline : TextDecoration.none,
+          decorationColor: textColor ?? BentoTokens.onSurfaceText(context),
+          decorationThickness: 1.5,
         ),
       ),
     );
-  }
 
-  _CycleType _getCycleTypeForDate(DateTime date) {
-    if (widget.predictedDate != null) {
-      final predictedStart = DateTimeUtils.dateOnly(widget.predictedDate!);
-      final predictedEnd = DateTimeUtils.addDays(
-        predictedStart,
-        AppConstants.periodDuration,
+    if (isPeakFertile) {
+      return DashedCellBorder(
+        color: _fertileTextColor(context),
+        borderRadius: radius,
+        child: cell,
       );
-
-      if (date.isAfter(predictedStart.subtract(const Duration(days: 1))) &&
-          date.isBefore(predictedEnd.add(const Duration(days: 1)))) {
-        return _CycleType.predicted;
-      }
     }
 
-    for (final cycle in widget.cycles) {
-      final cycleStart = DateTimeUtils.dateOnly(cycle.startDate);
-      final periodDuration =
-          cycle.periodDuration ?? AppConstants.periodDuration;
-      final periodEnd = DateTimeUtils.addDays(cycleStart, periodDuration);
-
-      if (date.isAfter(cycleStart.subtract(const Duration(days: 1))) &&
-          date.isBefore(periodEnd.add(const Duration(days: 1)))) {
-        return _CycleType.period;
-      }
-
-      if (cycle.cycleLength != null) {
-        final fertileStart = DateTimeUtils.addDays(cycleStart, 10);
-        final fertileEnd = DateTimeUtils.addDays(cycleStart, 17);
-
-        if (date.isAfter(fertileStart.subtract(const Duration(days: 1))) &&
-            date.isBefore(fertileEnd.add(const Duration(days: 1)))) {
-          return _CycleType.fertile;
-        }
-      }
-    }
-
-    return _CycleType.none;
+    return cell;
   }
 
-  Widget _buildLegend(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+  Color _fertileTextColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? BentoTokens.secondaryDark : const Color(0xFF4A9BB8);
+  }
+
+  Color _accentForKind(CalendarDayKind kind) {
+    switch (kind) {
+      case CalendarDayKind.period:
+        return BentoTokens.primary;
+      case CalendarDayKind.fertile:
+        return BentoTokens.secondary;
+      case CalendarDayKind.predicted:
+        return BentoTokens.predicted;
+      case CalendarDayKind.none:
+        return BentoTokens.primary;
+    }
+  }
+
+  Widget _buildLegend(BuildContext context, AppLocalizations l10n) {
+    return Wrap(
+      alignment: WrapAlignment.spaceAround,
+      spacing: BentoTokens.space16,
+      runSpacing: BentoTokens.space12,
       children: [
         _buildLegendItem(
           context,
-          color: Theme.of(context).colorScheme.primary,
-          label: 'Period',
+          color: BentoTokens.primary,
+          label: l10n.legendPeriod,
         ),
         _buildLegendItem(
           context,
-          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
-          label: 'Fertile',
+          color: _fertileTextColor(context),
+          label: l10n.legendFertile,
+          dashed: true,
         ),
         _buildLegendItem(
           context,
-          color: Colors.orange.withValues(alpha: 0.2),
-          label: 'Predicted',
+          color: BentoTokens.predicted,
+          label: l10n.legendPredicted,
         ),
       ],
     );
@@ -246,35 +271,38 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
     BuildContext context, {
     required Color color,
     required String label,
+    bool dashed = false,
   }) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 4),
+        if (dashed)
+          DashedCellBorder(
+            color: color,
+            borderRadius: BorderRadius.circular(BentoTokens.radiusSm),
+            child: Container(
+              width: 20,
+              height: 8,
+              alignment: Alignment.center,
+              child: Container(
+                width: 10,
+                height: 2,
+                color: color,
+              ),
+            ),
+          )
+        else
+          Container(
+            width: 20,
+            height: 8,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(BentoTokens.radiusSm),
+            ),
+          ),
+        const SizedBox(width: BentoTokens.space4),
         Text(label, style: Theme.of(context).textTheme.labelSmall),
       ],
     );
   }
-
-  static const _weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  static const _monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
 }
-
-enum _CycleType { none, period, fertile, predicted }

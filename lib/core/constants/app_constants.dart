@@ -10,6 +10,7 @@ class AppConstants {
 
   // Settings Keys
   static const String isDarkModeKey = 'is_dark_mode';
+  static const String localePreferenceKey = 'locale_preference';
   static const String isPinEnabledKey = 'is_pin_enabled';
   static const String userPinKey = 'user_pin';
   static const String isBiometricEnabledKey = 'is_biometric_enabled';

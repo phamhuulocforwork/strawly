@@ -2,14 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/utils/date_time_utils.dart';
 import '../../domain/entities/cycle.dart';
+import '../../l10n/app_localizations.dart';
+import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
+import '../widgets/bento_tile.dart';
+import '../widgets/period_range_picker.dart';
 
 class AddCycleScreen extends ConsumerStatefulWidget {
-  final Cycle? cycleToEdit;
+  const AddCycleScreen({
+    super.key,
+    this.cycleToEdit,
+    this.embeddedInSheet = false,
+    this.scrollController,
+    this.onSaved,
+  });
 
-  const AddCycleScreen({super.key, this.cycleToEdit});
+  final Cycle? cycleToEdit;
+  final bool embeddedInSheet;
+  final ScrollController? scrollController;
+  final VoidCallback? onSaved;
 
   @override
   ConsumerState<AddCycleScreen> createState() => _AddCycleScreenState();
@@ -17,10 +29,12 @@ class AddCycleScreen extends ConsumerStatefulWidget {
 
 class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
   final _formKey = GlobalKey<FormState>();
+  late ShadDateTimeRange? _periodRange;
   late DateTime _startDate;
   int? _cycleLength;
   int? _periodDuration;
   String? _notes;
+  PeriodRangeValidationError? _periodRangeError;
   bool _isLoading = false;
 
   @override
@@ -31,274 +45,223 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
       _cycleLength = widget.cycleToEdit!.cycleLength;
       _periodDuration = widget.cycleToEdit!.periodDuration;
       _notes = widget.cycleToEdit!.notes;
+      _periodRange = PeriodRangeLogic.fromCycle(_startDate, _periodDuration);
     } else {
-      _startDate = DateTime.now();
-      _periodDuration = AppConstants.periodDuration;
+      _periodRange = PeriodRangeLogic.defaultRange();
+      _applyRange(_periodRange);
     }
+  }
+
+  void _applyRange(ShadDateTimeRange? range) {
+    if (range?.start != null) {
+      _startDate = PeriodRangeLogic.startDateFrom(range!);
+    }
+    _periodDuration = range == null
+        ? null
+        : PeriodRangeLogic.periodDurationFrom(range);
+  }
+
+  void _onPeriodRangeChanged(ShadDateTimeRange? range) {
+    setState(() {
+      _periodRange = range;
+      _applyRange(range);
+      _periodRangeError = PeriodRangeLogic.validateError(range);
+    });
+  }
+
+  bool _validatePeriodRange(AppLocalizations l10n) {
+    final error = PeriodRangeLogic.validateError(_periodRange);
+    setState(() => _periodRangeError = error);
+    return error == null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.cycleToEdit != null ? 'Edit Cycle' : 'Add Cycle'),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    final l10n = AppLocalizations.of(context);
+
+    final form = Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.embeddedInSheet)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                BentoTokens.space16,
+                0,
+                BentoTokens.space16,
+                BentoTokens.space8,
+              ),
+              child: Text(
+                widget.cycleToEdit != null ? l10n.editCycle : l10n.addCycle,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+          BentoTile(
+            label: l10n.cycleEntryHelp,
+            variant: BentoTileVariant.primary,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ShadCard(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Record the start date of your period. The cycle length will be calculated automatically when you add the next cycle.',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                      ],
-                    ),
+                Icon(
+                  Icons.info_outline,
+                  color: BentoTokens.onSurfaceText(context),
+                ),
+                const SizedBox(width: BentoTokens.space12),
+                Expanded(
+                  child: Text(
+                    l10n.cycleEntryHelpText,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
-                const SizedBox(height: 24),
-
-                Text(
-                  'Start Date',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ShadCard(
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.calendar_today,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    title: const Text('Period Start Date'),
-                    subtitle: Text(DateTimeUtils.formatDate(_startDate)),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: _startDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime.now(),
-                      );
-                      if (date != null) {
-                        setState(() {
-                          _startDate = date;
-                        });
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                Text(
-                  'Period Duration (Optional)',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ShadCard(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'How many days did your period last?',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: _periodDuration?.toString(),
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: 'Days',
-                                  hintText: 'e.g., 5',
-                                  border: OutlineInputBorder(),
-                                  suffixText: 'days',
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _periodDuration = int.tryParse(value);
-                                  });
-                                },
-                                validator: (value) {
-                                  if (value != null && value.isNotEmpty) {
-                                    final duration = int.tryParse(value);
-                                    if (duration == null) {
-                                      return 'Please enter a valid number';
-                                    }
-                                    if (duration < 1 || duration > 10) {
-                                      return 'Duration should be between 1-10 days';
-                                    }
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                if (widget.cycleToEdit != null) ...[
-                  Text(
-                    'Cycle Length',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ShadCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Total cycle length (optional)',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  initialValue: _cycleLength?.toString(),
-                                  keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Cycle Length',
-                                    hintText: 'e.g., 28',
-                                    border: OutlineInputBorder(),
-                                    suffixText: 'days',
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _cycleLength = int.tryParse(value);
-                                    });
-                                  },
-                                  validator: (value) {
-                                    if (value != null && value.isNotEmpty) {
-                                      final length = int.tryParse(value);
-                                      if (length == null) {
-                                        return 'Please enter a valid number';
-                                      }
-                                      if (length <
-                                              AppConstants.minCycleLength ||
-                                          length >
-                                              AppConstants.maxCycleLength) {
-                                        return 'Length should be between ${AppConstants.minCycleLength}-${AppConstants.maxCycleLength} days';
-                                      }
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                Text(
-                  'Notes (Optional)',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ShadCard(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      initialValue: _notes,
-                      maxLines: 4,
-                      decoration: const InputDecoration(
-                        hintText: 'Add any notes about symptoms, mood, etc.',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _notes = value.isEmpty ? null : value;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveCycle,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            widget.cycleToEdit != null
-                                ? 'Update Cycle'
-                                : 'Add Cycle',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 16),
               ],
             ),
           ),
+          const SizedBox(height: BentoTokens.space16),
+          PeriodRangePicker(
+            selected: _periodRange,
+            onChanged: _onPeriodRangeChanged,
+            errorText: _periodRangeError == null
+                ? null
+                : PeriodRangeLogic.localizedMessage(
+                    _periodRangeError!,
+                    l10n,
+                  ),
+          ),
+          if (widget.cycleToEdit != null) ...[
+            const SizedBox(height: BentoTokens.space16),
+            Text(
+              l10n.cycleLength,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: BentoTokens.space4),
+            Text(
+              l10n.totalCycleLengthOptional,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: BentoTokens.mutedText(context),
+              ),
+            ),
+            const SizedBox(height: BentoTokens.space8),
+            TextFormField(
+              initialValue: _cycleLength?.toString(),
+              keyboardType: TextInputType.number,
+              style: Theme.of(context).textTheme.bodyMedium,
+              decoration: InputDecoration(
+                hintText: l10n.cycleLengthHint,
+                hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: BentoTokens.mutedText(context),
+                ),
+                suffixText: l10n.daysSuffix,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+                isDense: true,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _cycleLength = int.tryParse(value);
+                });
+              },
+              validator: (value) {
+                if (value != null && value.isNotEmpty) {
+                  final length = int.tryParse(value);
+                  if (length == null) {
+                    return l10n.enterValidNumber;
+                  }
+                  if (length < AppConstants.minCycleLength ||
+                      length > AppConstants.maxCycleLength) {
+                    return l10n.cycleLengthRange(
+                      AppConstants.minCycleLength,
+                      AppConstants.maxCycleLength,
+                    );
+                  }
+                }
+                return null;
+              },
+            ),
+          ],
+          const SizedBox(height: BentoTokens.space16),
+          Text(
+            l10n.notesOptional,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: BentoTokens.space8),
+          TextFormField(
+            initialValue: _notes,
+            maxLines: 4,
+            style: Theme.of(context).textTheme.bodyMedium,
+            decoration: InputDecoration(
+              hintText: l10n.notesHint,
+              hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: BentoTokens.mutedText(context),
+              ),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+              isDense: true,
+            ),
+            onChanged: (value) {
+              setState(() {
+                _notes = value.isEmpty ? null : value;
+              });
+            },
+          ),
+          const SizedBox(height: BentoTokens.space24),
+          ShadButton(
+            width: double.infinity,
+            onPressed: _isLoading ? null : () => _saveCycle(l10n),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(
+                    widget.cycleToEdit != null
+                        ? l10n.updateCycle
+                        : l10n.addCycle,
+                  ),
+          ),
+          const SizedBox(height: BentoTokens.space16),
+        ],
+      ),
+    );
+
+    if (widget.embeddedInSheet) {
+      return ListView(
+        controller: widget.scrollController,
+        padding: const EdgeInsets.all(BentoTokens.space16),
+        children: [form],
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.cycleToEdit != null ? l10n.editCycle : l10n.addCycle,
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(BentoTokens.space16),
+          child: form,
         ),
       ),
     );
   }
 
-  Future<void> _saveCycle() async {
-    if (!_formKey.currentState!.validate()) {
+  Future<void> _saveCycle(AppLocalizations l10n) async {
+    if (!_formKey.currentState!.validate() || !_validatePeriodRange(l10n)) {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final cycle = Cycle(
@@ -319,33 +282,36 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
         await ref.read(cycleListProvider.notifier).addCycle(cycle);
       }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              widget.cycleToEdit != null
-                  ? 'Cycle updated successfully'
-                  : 'Cycle added successfully',
-            ),
-            backgroundColor: Colors.green,
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.cycleToEdit != null
+                ? l10n.cycleUpdatedSuccess
+                : l10n.cycleAddedSuccess,
           ),
-        );
+          backgroundColor: BentoTokens.success,
+        ),
+      );
+
+      if (widget.onSaved != null) {
+        widget.onSaved!();
+      } else {
         Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            content: Text(l10n.errorMessage(e.toString())),
+            backgroundColor: BentoTokens.danger,
           ),
         );
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
