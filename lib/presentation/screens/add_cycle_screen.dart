@@ -4,6 +4,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../core/constants/app_constants.dart';
 import '../../domain/entities/cycle.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
 import '../widgets/bento_tile.dart';
@@ -104,7 +105,7 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  Icons.info_outline,
+                  AppIcons.info,
                   color: BentoTokens.onSurfaceText(context),
                 ),
                 const SizedBox(width: BentoTokens.space12),
@@ -146,19 +147,9 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
               initialValue: _cycleLength?.toString(),
               keyboardType: TextInputType.number,
               style: Theme.of(context).textTheme.bodyMedium,
-              decoration: InputDecoration(
+              decoration: _outlinedFieldDecoration(
                 hintText: l10n.cycleLengthHint,
-                hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: BentoTokens.mutedText(context),
-                ),
                 suffixText: l10n.daysSuffix,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                focusedErrorBorder: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
               ),
               onChanged: (value) {
                 setState(() {
@@ -193,19 +184,7 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
             initialValue: _notes,
             maxLines: 4,
             style: Theme.of(context).textTheme.bodyMedium,
-            decoration: InputDecoration(
-              hintText: l10n.notesHint,
-              hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: BentoTokens.mutedText(context),
-              ),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-              isDense: true,
-            ),
+            decoration: _outlinedFieldDecoration(hintText: l10n.notesHint),
             onChanged: (value) {
               setState(() {
                 _notes = value.isEmpty ? null : value;
@@ -215,6 +194,9 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
           const SizedBox(height: BentoTokens.space24),
           ShadButton(
             width: double.infinity,
+            backgroundColor: BentoTokens.primaryButton,
+            hoverBackgroundColor: BentoTokens.primaryButtonHover,
+            foregroundColor: Colors.white,
             onPressed: _isLoading ? null : () => _saveCycle(l10n),
             child: _isLoading
                 ? const SizedBox(
@@ -252,6 +234,42 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
           padding: const EdgeInsets.all(BentoTokens.space16),
           child: form,
         ),
+      ),
+    );
+  }
+
+  InputDecoration _outlinedFieldDecoration({
+    required String hintText,
+    String? suffixText,
+  }) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(BentoTokens.radiusSm),
+      borderSide: BorderSide(color: BentoTokens.tileBorder(context)),
+    );
+
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        color: BentoTokens.mutedText(context),
+      ),
+      suffixText: suffixText,
+      filled: true,
+      fillColor: BentoTokens.tileBackground(context),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: BentoTokens.space16,
+        vertical: BentoTokens.space12,
+      ),
+      isDense: true,
+      border: border,
+      enabledBorder: border,
+      focusedBorder: border.copyWith(
+        borderSide: const BorderSide(color: BentoTokens.primary, width: 1.5),
+      ),
+      errorBorder: border.copyWith(
+        borderSide: const BorderSide(color: BentoTokens.danger),
+      ),
+      focusedErrorBorder: border.copyWith(
+        borderSide: const BorderSide(color: BentoTokens.danger, width: 1.5),
       ),
     );
   }

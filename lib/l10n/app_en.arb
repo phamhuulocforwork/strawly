@@ -194,6 +194,17 @@
   "deleteAllButton": "Delete all",
   "allDataDeleted": "All data deleted",
   "deleteFailed": "Delete failed: {error}",
+  "deleteCycleTitle": "Delete this cycle?",
+  "deleteCycleConfirm": "The cycle starting {date} will be permanently deleted.",
+  "@deleteCycleConfirm": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteCycleButton": "Delete",
+  "cycleDeleted": "Cycle deleted",
   "@deleteFailed": {
     "placeholders": {
       "error": {

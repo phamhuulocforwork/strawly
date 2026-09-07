@@ -42,6 +42,47 @@ void main() {
     expect(kind, CalendarDayKind.predicted);
   });
 
+  test('cycleForDate returns the cycle covering a period day', () {
+    final cycle = ongoingCycle();
+
+    expect(
+      CycleCalendarLogic.cycleForDate(
+        DateTime(2026, 8, 26),
+        cycles: [cycle],
+      ),
+      cycle,
+    );
+    expect(
+      CycleCalendarLogic.cycleForDate(
+        DateTime(2026, 8, 30),
+        cycles: [cycle],
+      ),
+      cycle,
+    );
+  });
+
+  test('cycleForDate returns the cycle covering a fertile day', () {
+    final cycle = ongoingCycle();
+
+    expect(
+      CycleCalendarLogic.cycleForDate(
+        DateTime(2026, 9, 8),
+        cycles: [cycle],
+      ),
+      cycle,
+    );
+  });
+
+  test('cycleForDate returns null when the day belongs to no cycle', () {
+    expect(
+      CycleCalendarLogic.cycleForDate(
+        DateTime(2026, 7, 1),
+        cycles: [ongoingCycle()],
+      ),
+      isNull,
+    );
+  });
+
   test('peak fertility is cycle day 14 from start', () {
     expect(
       CycleCalendarLogic.peakFertilityDay(ongoingCycle()),

@@ -6,6 +6,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../core/di/providers.dart';
 import '../../core/l10n/locale_support.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
 import '../viewmodels/locale_viewmodel.dart';
@@ -43,8 +44,8 @@ class SettingsScreen extends ConsumerWidget {
                 contentPadding: EdgeInsets.zero,
                 secondary: Icon(
                   themeMode == ThemeMode.dark
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
+                      ? AppIcons.darkMode
+                      : AppIcons.lightMode,
                   color: BentoTokens.onSurfaceText(context),
                 ),
                 title: Text(l10n.darkMode),
@@ -66,7 +67,7 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
-                      Icons.language,
+                      AppIcons.language,
                       color: BentoTokens.onSurfaceText(context),
                     ),
                     title: Text(l10n.language),
@@ -126,31 +127,31 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
-                      Icons.upload_file,
+                      AppIcons.upload,
                       color: BentoTokens.onSurfaceText(context),
                     ),
                     title: Text(l10n.exportData),
                     subtitle: Text(l10n.exportDataSubtitle),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const Icon(AppIcons.chevronRight),
                     onTap: () => _exportData(context, ref, l10n),
                   ),
                   const Divider(height: 1),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
-                      Icons.download,
+                      AppIcons.download,
                       color: BentoTokens.onSurfaceText(context),
                     ),
                     title: Text(l10n.importData),
                     subtitle: Text(l10n.importDataSubtitle),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const Icon(AppIcons.chevronRight),
                     onTap: () => _importData(context, ref, l10n),
                   ),
                   const Divider(height: 1),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(
-                      Icons.delete_forever,
+                      AppIcons.delete,
                       color: BentoTokens.danger,
                     ),
                     title: Text(
@@ -158,7 +159,7 @@ class SettingsScreen extends ConsumerWidget {
                       style: const TextStyle(color: BentoTokens.danger),
                     ),
                     subtitle: Text(l10n.deleteAllDataSubtitle),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const Icon(AppIcons.chevronRight),
                     onTap: () => _deleteAllData(context, ref, l10n),
                   ),
                 ],
@@ -176,7 +177,7 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
-                      Icons.info_outline,
+                      AppIcons.info,
                       color: BentoTokens.onSurfaceText(context),
                     ),
                     title: Text(l10n.version),
@@ -186,7 +187,7 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
-                      Icons.privacy_tip_outlined,
+                      AppIcons.privacy,
                       color: BentoTokens.onSurfaceText(context),
                     ),
                     title: Text(l10n.privacy),
@@ -196,7 +197,7 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
-                      Icons.lock_outline,
+                      AppIcons.lock,
                       color: BentoTokens.onSurfaceText(context),
                     ),
                     title: Text(l10n.security),
@@ -213,7 +214,7 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               children: [
                 Icon(
-                  Icons.favorite,
+                  AppIcons.heart,
                   color: BentoTokens.onSurfaceText(context),
                   size: 40,
                 ),

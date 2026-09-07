@@ -3,6 +3,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import 'bento_tile.dart';
 import 'range_day_style.dart';
@@ -309,7 +310,7 @@ class _InlineRangeCalendarState extends State<_InlineRangeCalendar> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.chevron_left),
+              icon: const Icon(AppIcons.chevronLeft),
               onPressed: _canGoBack()
                   ? () => setState(() {
                       _visibleMonth = DateTime(
@@ -326,7 +327,7 @@ class _InlineRangeCalendarState extends State<_InlineRangeCalendar> {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.chevron_right),
+              icon: const Icon(AppIcons.chevronRight),
               onPressed: _canGoForward()
                   ? () => setState(() {
                       _visibleMonth = DateTime(

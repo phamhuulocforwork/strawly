@@ -12,13 +12,18 @@ import 'package:strawly/data/models/cycle_model.dart';
 import 'package:strawly/domain/entities/cycle.dart';
 import 'package:strawly/domain/entities/cycle_statistics.dart';
 import 'package:strawly/l10n/app_localizations.dart';
+import 'package:strawly/presentation/screens/add_cycle_screen.dart';
+import 'package:strawly/presentation/screens/home_screen.dart';
 import 'package:strawly/presentation/screens/statistics_screen.dart';
 import 'package:strawly/presentation/shell/app_shell.dart';
+import 'package:strawly/presentation/theme/bento_tokens.dart';
 import 'package:strawly/presentation/viewmodels/cycle_viewmodel.dart';
 import 'package:strawly/presentation/viewmodels/locale_viewmodel.dart';
 import 'package:strawly/presentation/viewmodels/theme_viewmodel.dart';
 import 'package:strawly/presentation/widgets/bento_grid.dart';
+import 'package:strawly/presentation/widgets/bento_tile.dart';
 import 'package:strawly/presentation/widgets/prediction_card_widget.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class _TestCycleListNotifier extends CycleListNotifier {
   _TestCycleListNotifier(super.ref, {this.cycles = const []});
@@ -71,6 +76,7 @@ void main() {
       isRegular: false,
     ),
     LocalePreference localePreference = LocalePreference.en,
+    DateTime? predictedDate,
   }) {
     return ProviderScope(
       overrides: [
@@ -82,7 +88,9 @@ void main() {
           (ref) => _TestCycleListNotifier(ref, cycles: cycles),
         ),
         cycleStatisticsProvider.overrideWith((ref) => Future.value(statistics)),
-        predictedNextCycleDateProvider.overrideWith((ref) => Future.value(null)),
+        predictedNextCycleDateProvider.overrideWith(
+          (ref) => Future.value(predictedDate),
+        ),
       ],
       child: MaterialApp(
         locale: LocaleSupport.materialLocaleFor(localePreference),
@@ -105,6 +113,23 @@ void main() {
     );
   }
 
+  Widget buildShadTestApp(
+    Widget child, {
+    List<Cycle> cycles = const [],
+    DateTime? predictedDate,
+  }) {
+    return ShadApp.custom(
+      theme: AppTheme.lightTheme(),
+      appBuilder: (context) {
+        return buildTestApp(
+          child,
+          cycles: cycles,
+          predictedDate: predictedDate,
+        );
+      },
+    );
+  }
+
   testWidgets('AppShell shows home dashboard and switches tabs', (
     WidgetTester tester,
   ) async {
@@ -114,6 +139,12 @@ void main() {
     expect(find.text('Strawly'), findsOneWidget);
     expect(find.text('Your private cycle dashboard'), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(
+      Theme.of(tester.element(find.byType(FloatingActionButton)))
+          .floatingActionButtonTheme
+          .backgroundColor,
+      BentoTokens.primaryButton,
+    );
     expect(find.text('Log period today'), findsOneWidget);
 
     await tester.tap(find.text('Stats'));
@@ -255,5 +286,233 @@ void main() {
     expect(find.text('Current cycle day'), findsOneWidget);
     expect(find.text('Day 5'), findsOneWidget);
     expect(find.text('Enough data to predict: 0 cycles'), findsOneWidget);
+  });
+
+  testWidgets('recent cycle hover row includes tile padding', (
+    WidgetTester tester,
+  ) async {
+    final created = DateTime(2026, 9, 6);
+    await tester.pumpWidget(
+      buildTestApp(
+        const HomeScreen(),
+        cycles: [
+          Cycle(
+            id: 'ongoing',
+            startDate: created,
+            periodDuration: 5,
+            createdAt: created,
+            updatedAt: created,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final rowLabel = find.text('Ongoing');
+    expect(rowLabel, findsOneWidget);
+
+    final tile = tester.widget<BentoTile>(
+      find.ancestor(of: rowLabel, matching: find.byType(BentoTile)).first,
+    );
+    expect(tile.padding, EdgeInsets.zero);
+
+    final inkWell = find.ancestor(
+      of: rowLabel,
+      matching: find.byType(InkWell),
+    );
+    final padding = tester.widget<Padding>(
+      find.descendant(of: inkWell, matching: find.byType(Padding)).first,
+    );
+    final insets = padding.padding.resolve(TextDirection.ltr);
+    expect(insets.left, BentoTokens.tilePadding);
+    expect(insets.right, BentoTokens.tilePadding);
+    expect(insets.top, greaterThanOrEqualTo(BentoTokens.space8));
+    expect(insets.bottom, greaterThanOrEqualTo(BentoTokens.space8));
+  });
+
+  testWidgets('cycle length and notes fields have fill and outline', (
+    WidgetTester tester,
+  ) async {
+    final created = DateTime(2026, 9, 6);
+    await tester.pumpWidget(
+      buildShadTestApp(
+        AddCycleScreen(
+          cycleToEdit: Cycle(
+            id: 'edit',
+            startDate: created,
+            cycleLength: 28,
+            periodDuration: 5,
+            createdAt: created,
+            updatedAt: created,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    TextField fieldWithHint(String hint) {
+      return tester.widget<TextField>(
+        find.byWidgetPredicate(
+          (widget) => widget is TextField && widget.decoration?.hintText == hint,
+        ),
+      );
+    }
+
+    final cycleLengthField = fieldWithHint('e.g., 28');
+    final notesField = fieldWithHint(
+      'Add notes about symptoms, mood, etc.',
+    );
+
+    for (final field in [cycleLengthField, notesField]) {
+      final decoration = field.decoration!;
+      expect(decoration.filled, isTrue);
+      expect(decoration.fillColor, isNotNull);
+      expect(decoration.border, isA<OutlineInputBorder>());
+      expect(decoration.enabledBorder, isA<OutlineInputBorder>());
+      expect(decoration.focusedBorder, isA<OutlineInputBorder>());
+    }
+  });
+
+  testWidgets('submit button uses a stronger primary fill', (
+    WidgetTester tester,
+  ) async {
+    final created = DateTime(2026, 9, 6);
+    await tester.pumpWidget(
+      buildShadTestApp(
+        AddCycleScreen(
+          cycleToEdit: Cycle(
+            id: 'edit',
+            startDate: created,
+            cycleLength: 28,
+            periodDuration: 5,
+            createdAt: created,
+            updatedAt: created,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final button = tester.widget<ShadButton>(
+      find.widgetWithText(ShadButton, 'Update cycle'),
+    );
+    expect(button.backgroundColor, BentoTokens.primaryButton);
+    expect(button.foregroundColor, Colors.white);
+  });
+
+  testWidgets('recent cycles list is capped at 5 rows', (
+    WidgetTester tester,
+  ) async {
+    final created = DateTime(2026, 1, 1);
+    final cycles = List<Cycle>.generate(6, (index) {
+      return Cycle(
+        id: 'cycle-$index',
+        startDate: DateTime(2026, 1, 1 + index * 28),
+        cycleLength: 28,
+        periodDuration: 5,
+        createdAt: created,
+        updatedAt: created,
+      );
+    });
+
+    await tester.pumpWidget(buildTestApp(const HomeScreen(), cycles: cycles));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Dismissible), findsNWidgets(5));
+  });
+
+  testWidgets('swiping a recent cycle left asks for delete confirmation', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final created = DateTime(2026, 9, 6);
+    await tester.pumpWidget(
+      buildShadTestApp(
+        const HomeScreen(),
+        cycles: [
+          Cycle(
+            id: 'ongoing',
+            startDate: created,
+            periodDuration: 5,
+            createdAt: created,
+            updatedAt: created,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final ongoing = find.text('Ongoing');
+    await tester.drag(ongoing, const Offset(-400, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delete this cycle?'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ongoing'), findsOneWidget);
+    expect(find.text('Delete this cycle?'), findsNothing);
+  });
+
+  testWidgets('tapping the countdown ring opens edit cycle', (
+    WidgetTester tester,
+  ) async {
+    final created = DateTime(2026, 8, 26);
+    await tester.pumpWidget(
+      buildShadTestApp(
+        const HomeScreen(),
+        predictedDate: DateTime(2026, 10, 1),
+        cycles: [
+          Cycle(
+            id: 'ongoing',
+            startDate: created,
+            periodDuration: 5,
+            createdAt: created,
+            updatedAt: created,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('prediction-countdown-ring')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit cycle'), findsOneWidget);
+  });
+
+  testWidgets('tapping a period day on the calendar opens edit cycle', (
+    WidgetTester tester,
+  ) async {
+    final created = DateTime(2026, 9, 6);
+    await tester.pumpWidget(
+      buildShadTestApp(
+        const HomeScreen(),
+        cycles: [
+          Cycle(
+            id: 'ongoing',
+            startDate: created,
+            periodDuration: 5,
+            createdAt: created,
+            updatedAt: created,
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.descendant(of: find.byType(GridView), matching: find.text('6')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit cycle'), findsOneWidget);
   });
 }

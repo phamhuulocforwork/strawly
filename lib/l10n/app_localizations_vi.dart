@@ -114,7 +114,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get periodDateRange => 'Ngày kỳ kinh';
 
   @override
-  String get periodDates => 'Chọn ngày kỳ kinh';
+  String get periodDates => 'Ngày hành kinh';
 
   @override
   String get periodDatesHint => 'Em chạm ngày bắt đầu, rồi ngày kết thúc nhé.';
@@ -333,6 +333,20 @@ class AppLocalizationsVi extends AppLocalizations {
   String deleteFailed(String error) {
     return 'Xóa không được: $error';
   }
+
+  @override
+  String get deleteCycleTitle => 'Xóa chu kỳ này?';
+
+  @override
+  String deleteCycleConfirm(String date) {
+    return 'Chu kỳ bắt đầu $date sẽ bị xóa, không khôi phục được.';
+  }
+
+  @override
+  String get deleteCycleButton => 'Xóa';
+
+  @override
+  String get cycleDeleted => 'Đã xóa chu kỳ';
 
   @override
   String get statistics => 'Thống kê';

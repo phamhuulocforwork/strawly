@@ -686,6 +686,30 @@ abstract class AppLocalizations {
   /// **'Delete failed: {error}'**
   String deleteFailed(String error);
 
+  /// No description provided for @deleteCycleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this cycle?'**
+  String get deleteCycleTitle;
+
+  /// No description provided for @deleteCycleConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'The cycle starting {date} will be permanently deleted.'**
+  String deleteCycleConfirm(String date);
+
+  /// No description provided for @deleteCycleButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteCycleButton;
+
+  /// No description provided for @cycleDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle deleted'**
+  String get cycleDeleted;
+
   /// No description provided for @statistics.
   ///
   /// In en, this message translates to:

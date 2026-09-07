@@ -353,6 +353,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get deleteCycleTitle => 'Delete this cycle?';
+
+  @override
+  String deleteCycleConfirm(String date) {
+    return 'The cycle starting $date will be permanently deleted.';
+  }
+
+  @override
+  String get deleteCycleButton => 'Delete';
+
+  @override
+  String get cycleDeleted => 'Cycle deleted';
+
+  @override
   String get statistics => 'Statistics';
 
   @override

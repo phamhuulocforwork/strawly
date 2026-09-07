@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../screens/add_cycle_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
@@ -61,7 +62,7 @@ class _AppShellState extends ConsumerState<AppShell> {
           ? FloatingActionButton(
               onPressed: _openAddCycleSheet,
               tooltip: l10n.addCycleTooltip,
-              child: const Icon(Icons.add),
+              child: const Icon(AppIcons.add),
             )
           : null,
       bottomNavigationBar: NavigationBar(
@@ -71,15 +72,15 @@ class _AppShellState extends ConsumerState<AppShell> {
         },
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
+            icon: const Icon(AppIcons.home),
             label: l10n.navHome,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.bar_chart_outlined),
+            icon: const Icon(AppIcons.stats),
             label: l10n.navStats,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
+            icon: const Icon(AppIcons.settings),
             label: l10n.navSettings,
           ),
         ],

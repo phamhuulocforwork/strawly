@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../../domain/entities/cycle.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import 'bento_tile.dart';
 import 'cycle_calendar_logic.dart';
@@ -13,10 +14,12 @@ class CycleCalendarWidget extends StatefulWidget {
     super.key,
     required this.cycles,
     this.predictedDate,
+    this.onCycleTap,
   });
 
   final List<Cycle> cycles;
   final DateTime? predictedDate;
+  final ValueChanged<Cycle>? onCycleTap;
 
   @override
   State<CycleCalendarWidget> createState() => _CycleCalendarWidgetState();
@@ -45,7 +48,7 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.chevron_left),
+                icon: const Icon(AppIcons.chevronLeft),
                 onPressed: () {
                   setState(() {
                     selectedMonth = DateTime(
@@ -57,12 +60,12 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
               ),
               Text(
                 DateTimeUtils.formatMonthYear(selectedMonth, locale),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               IconButton(
-                icon: const Icon(Icons.chevron_right),
+                icon: const Icon(AppIcons.chevronRight),
                 onPressed: () {
                   setState(() {
                     selectedMonth = DateTime(
@@ -122,11 +125,7 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
             }
 
             final day = index - firstWeekday + 1;
-            final date = DateTime(
-              selectedMonth.year,
-              selectedMonth.month,
-              day,
-            );
+            final date = DateTime(selectedMonth.year, selectedMonth.month, day);
             final columnIndex = index % 7;
 
             return _buildDayCell(context, date, columnIndex);
@@ -187,7 +186,7 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
             isToday: isToday,
           );
 
-    final cell = Container(
+    Widget cell = Container(
       height: 40,
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -213,14 +212,26 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
     );
 
     if (isPeakFertile) {
-      return DashedCellBorder(
+      cell = DashedCellBorder(
         color: _fertileTextColor(context),
         borderRadius: radius,
         child: cell,
       );
     }
 
-    return cell;
+    final cycle = CycleCalendarLogic.cycleForDate(date, cycles: widget.cycles);
+    if (cycle == null || widget.onCycleTap == null) {
+      return cell;
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => widget.onCycleTap!(cycle),
+        borderRadius: radius,
+        child: cell,
+      ),
+    );
   }
 
   Color _fertileTextColor(BuildContext context) {
@@ -284,11 +295,7 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
               width: 20,
               height: 8,
               alignment: Alignment.center,
-              child: Container(
-                width: 10,
-                height: 2,
-                color: color,
-              ),
+              child: Container(width: 10, height: 2, color: color),
             ),
           )
         else

@@ -54,6 +54,11 @@ class AppTheme {
       ),
       radius: BentoTokens.tileRadius,
       textTheme: ShadTextTheme(family: GoogleFonts.inter().fontFamily!),
+      primaryButtonTheme: const ShadButtonTheme(
+        backgroundColor: BentoTokens.primaryButton,
+        hoverBackgroundColor: BentoTokens.primaryButtonHover,
+        foregroundColor: Colors.white,
+      ),
     );
   }
 
@@ -69,6 +74,11 @@ class AppTheme {
       ),
       radius: BentoTokens.tileRadius,
       textTheme: ShadTextTheme(family: GoogleFonts.inter().fontFamily!),
+      primaryButtonTheme: const ShadButtonTheme(
+        backgroundColor: BentoTokens.primaryButton,
+        hoverBackgroundColor: BentoTokens.primaryButtonHover,
+        foregroundColor: Colors.white,
+      ),
     );
   }
 
@@ -99,9 +109,9 @@ class AppTheme {
           GoogleFonts.inter(fontSize: BentoTokens.font12),
         ),
       ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: shadTheme.colorScheme.primary,
-        foregroundColor: BentoTokens.text,
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: BentoTokens.primaryButton,
+        foregroundColor: Colors.white,
         elevation: 2,
       ),
     );

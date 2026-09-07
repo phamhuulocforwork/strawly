@@ -6,6 +6,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../../domain/entities/cycle.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
 import 'cycle_calendar_logic.dart';
@@ -16,11 +17,13 @@ class PredictionCardWidget extends ConsumerStatefulWidget {
     this.predictedDate,
     this.cycles = const [],
     this.averageCycleLength = AppConstants.defaultCycleLength,
+    this.onCurrentCycleTap,
   });
 
   final DateTime? predictedDate;
   final List<Cycle> cycles;
   final int averageCycleLength;
+  final VoidCallback? onCurrentCycleTap;
 
   @override
   ConsumerState<PredictionCardWidget> createState() =>
@@ -71,15 +74,14 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
         : (daysUntil / maxCycle).clamp(0.0, 1.0);
     final displayDays = daysUntil <= 0 ? 0 : daysUntil;
 
-    _progressAnimation = Tween<double>(begin: 0, end: targetProgress).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    _progressAnimation = Tween<double>(
+      begin: 0,
+      end: targetProgress,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _daysAnimation = Tween<double>(
       begin: 0,
       end: displayDays.toDouble(),
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
   }
 
   int _rawDaysUntil() {
@@ -89,7 +91,9 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
 
   bool _hasCycleToday(List<Cycle> cycles) {
     final today = DateTimeUtils.dateOnly(DateTime.now());
-    return cycles.any((cycle) => DateTimeUtils.isSameDay(cycle.startDate, today));
+    return cycles.any(
+      (cycle) => DateTimeUtils.isSameDay(cycle.startDate, today),
+    );
   }
 
   String _phaseLabel(CyclePhase? phase, AppLocalizations l10n) {
@@ -169,9 +173,9 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
           children: [
             Text(
               l10n.noPredictionYet,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: BentoTokens.space4),
             Text(
@@ -208,6 +212,7 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
                     progress: _progressAnimation.value,
                     days: _daysAnimation.value.round(),
                     daysLabel: l10n.daysLabel,
+                    onTap: widget.onCurrentCycleTap,
                   ),
                   const SizedBox(width: BentoTokens.space16),
                   Expanded(
@@ -216,17 +221,20 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
                       children: [
                         Text(
                           l10n.predictedNextPeriod,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: BentoTokens.mutedText(context),
-                            fontSize: BentoTokens.font14,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: BentoTokens.mutedText(context),
+                                fontSize: BentoTokens.font14,
+                              ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          DateTimeUtils.formatDate(widget.predictedDate!, locale),
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                          DateTimeUtils.formatDate(
+                            widget.predictedDate!,
+                            locale,
                           ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: BentoTokens.space8),
                         _PhaseBadge(
@@ -261,10 +269,7 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
 }
 
 class _PredictionCardShell extends StatelessWidget {
-  const _PredictionCardShell({
-    required this.child,
-    required this.loggedToday,
-  });
+  const _PredictionCardShell({required this.child, required this.loggedToday});
 
   final Widget child;
   final bool loggedToday;
@@ -293,11 +298,13 @@ class _CountdownRing extends StatelessWidget {
     required this.progress,
     required this.days,
     required this.daysLabel,
+    this.onTap,
   });
 
   final double progress;
   final int days;
   final String daysLabel;
+  final VoidCallback? onTap;
 
   static const _size = 88.0;
   static const _stroke = 7.0;
@@ -305,7 +312,8 @@ class _CountdownRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    return SizedBox(
+    final ring = SizedBox(
+      key: const Key('prediction-countdown-ring'),
       width: _size,
       height: _size,
       child: Stack(
@@ -340,6 +348,17 @@ class _CountdownRing extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+
+    if (onTap == null) return ring;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: ring,
       ),
     );
   }
@@ -451,9 +470,10 @@ class _PhaseBadge extends StatelessWidget {
         isDark ? BentoTokens.primaryDark : BentoTokens.primary,
       CyclePhase.follicular =>
         isDark ? BentoTokens.accentDark : BentoTokens.accent,
-      CyclePhase.fertile => isDark
-          ? BentoTokens.secondaryDark
-          : Color.lerp(BentoTokens.secondary, BentoTokens.text, 0.35)!,
+      CyclePhase.fertile =>
+        isDark
+            ? BentoTokens.secondaryDark
+            : Color.lerp(BentoTokens.secondary, BentoTokens.text, 0.35)!,
       CyclePhase.luteal => BentoTokens.predicted,
       null => isDark ? BentoTokens.accentDark : BentoTokens.accent,
     };
@@ -461,11 +481,11 @@ class _PhaseBadge extends StatelessWidget {
 
   static IconData _iconForPhase(CyclePhase? phase) {
     return switch (phase) {
-      CyclePhase.period => Icons.water_drop_outlined,
-      CyclePhase.follicular => Icons.spa_outlined,
-      CyclePhase.fertile => Icons.favorite_outline,
-      CyclePhase.luteal => Icons.nightlight_round,
-      null => Icons.spa_outlined,
+      CyclePhase.period => AppIcons.period,
+      CyclePhase.follicular => AppIcons.follicular,
+      CyclePhase.fertile => AppIcons.fertile,
+      CyclePhase.luteal => AppIcons.luteal,
+      null => AppIcons.follicular,
     };
   }
 
@@ -521,7 +541,6 @@ class _LogPeriodButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Transform.scale(
       scale: scale,
       child: SizedBox(
@@ -530,23 +549,23 @@ class _LogPeriodButton extends StatelessWidget {
         child: FilledButton.icon(
           onPressed: loading ? null : onPressed,
           style: FilledButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
+            backgroundColor: BentoTokens.primaryButton,
+            foregroundColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
           icon: loading
-              ? SizedBox(
+              ? const SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: colorScheme.onPrimary,
+                    color: Colors.white,
                   ),
                 )
-              : const Icon(Icons.add, size: 16),
+              : const Icon(AppIcons.add, size: 16),
           label: Text(
             label,
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),

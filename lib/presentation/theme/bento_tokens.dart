@@ -6,12 +6,14 @@ class BentoTokens {
 
   // Light palette (original Strawly)
   static const Color primary = Color(0xFFF4A6B5);
+  static const Color primaryButton = Color(0xFFC44B6A);
+  static const Color primaryButtonHover = Color(0xFFB03E5C);
   static const Color secondary = Color(0xFFB5E2F4);
   static const Color accent = Color(0xFFE8D4F2);
   static const Color success = Color(0xFF16A34A);
   static const Color warning = Color(0xFFD97706);
   static const Color predicted = Color(0xFFF3C98A);
-  static const Color danger = Color(0xFFDC2626);
+  static const Color danger = Color(0xFFFF5A5A);
   static const Color surface = Color(0xFFFFFBF7);
   static const Color text = Color(0xFF2D2D2D);
 

@@ -22,6 +22,7 @@ class AppConstants {
   static const int periodDuration = 5; // Average period duration in days
   static const int cyclesToConsider =
       6; // Number of recent cycles for prediction
+  static const int recentCyclesLimit = 5;
 
   // Statistics
   static const int regularCycleVariation =

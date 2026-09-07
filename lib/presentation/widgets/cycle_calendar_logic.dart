@@ -122,6 +122,23 @@ class CycleCalendarLogic {
     return CalendarDayKind.none;
   }
 
+  static Cycle? cycleForDate(
+    DateTime date, {
+    required List<Cycle> cycles,
+  }) {
+    final normalized = DateTimeUtils.dateOnly(date);
+
+    for (final cycle in cycles) {
+      if (periodRange(cycle).contains(normalized)) return cycle;
+    }
+
+    for (final cycle in cycles) {
+      if (fertileRange(cycle).contains(normalized)) return cycle;
+    }
+
+    return null;
+  }
+
   static Cycle? latestCycle(List<Cycle> cycles) {
     if (cycles.isEmpty) return null;
     return cycles.reduce(

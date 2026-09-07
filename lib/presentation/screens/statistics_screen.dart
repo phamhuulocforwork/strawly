@@ -6,6 +6,7 @@ import '../../domain/entities/cycle.dart';
 import '../../domain/entities/cycle_statistics.dart';
 import '../../domain/usecases/statistics_calculations.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
 import '../widgets/bento_tile.dart';
@@ -59,7 +60,7 @@ class StatisticsScreen extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.insert_chart_outlined,
+                          AppIcons.chartCombined,
                           size: 56,
                           color: BentoTokens.mutedText(context),
                         ),

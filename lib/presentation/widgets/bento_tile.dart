@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 
 enum BentoTileVariant { neutral, primary, secondary, success, warning, danger }
@@ -62,7 +63,7 @@ class BentoTile extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.error_outline, color: BentoTokens.danger),
+                    Icon(AppIcons.error, color: BentoTokens.danger),
                     const SizedBox(width: BentoTokens.space8),
                     Text(
                       AppLocalizations.of(context).somethingWentWrong,

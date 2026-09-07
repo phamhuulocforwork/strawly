@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/cycle_statistics.dart';
 import '../../l10n/app_localizations.dart';
+import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 
 class StatsMetricsSection extends StatelessWidget {
@@ -24,7 +25,7 @@ class StatsMetricsSection extends StatelessWidget {
             children: [
               Expanded(
                 child: _StatsHeroCard(
-                  icon: Icons.calendar_month_outlined,
+                  icon: AppIcons.calendarDays,
                   label: l10n.avgCycle,
                   value: l10n.avgCycleDays(
                     statistics.averageCycleLength.toStringAsFixed(1),
@@ -34,7 +35,7 @@ class StatsMetricsSection extends StatelessWidget {
               const SizedBox(width: BentoTokens.gridGap),
               Expanded(
                 child: _StatsHeroCard(
-                  icon: Icons.water_drop_outlined,
+                  icon: AppIcons.period,
                   label: l10n.avgPeriod,
                   value: statistics.averagePeriodDuration != null
                       ? l10n.daysUnit(
@@ -116,14 +117,14 @@ class _StatsDetailCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final rows = <Widget>[
       _StatsDetailRow(
-        icon: Icons.repeat,
+        icon: AppIcons.repeat,
         iconColor: BentoTokens.statBlue(context),
         label: l10n.totalCycles,
         value: statistics.totalCycles.toString(),
         showDivider: true,
       ),
       _StatsDetailRow(
-        icon: Icons.show_chart_outlined,
+        icon: AppIcons.chartLine,
         iconColor: BentoTokens.statPurple(context),
         label: l10n.stdDev,
         value: l10n.daysUnit(
@@ -137,7 +138,7 @@ class _StatsDetailCard extends StatelessWidget {
       if (statistics.shortestCycleLength != null &&
           statistics.longestCycleLength != null)
         _StatsDetailRow(
-          icon: Icons.swap_vert,
+          icon: AppIcons.swapVertical,
           iconColor: BentoTokens.statAmber(context),
           label: l10n.shortestLongest,
           value: l10n.cycleLengthRange(
@@ -148,7 +149,7 @@ class _StatsDetailCard extends StatelessWidget {
         ),
       if (statistics.currentCycleDay != null)
         _StatsDetailRow(
-          icon: Icons.event_outlined,
+          icon: AppIcons.calendarDays,
           iconColor: BentoTokens.mutedText(context),
           label: l10n.currentCycleDay,
           value: l10n.currentCycleDayValue(statistics.currentCycleDay!),
@@ -242,7 +243,7 @@ class _StatsPredictionStatus extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: BentoTokens.space4),
       child: Row(
         children: [
-          Icon(Icons.check_circle_outline, size: 18, color: color),
+          Icon(AppIcons.checkCircle, size: 18, color: color),
           const SizedBox(width: BentoTokens.space8),
           Expanded(
             child: Text(
