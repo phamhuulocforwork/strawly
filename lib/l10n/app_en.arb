@@ -288,5 +288,7 @@
   "phaseFollicular": "Follicular",
   "phaseFertile": "Fertile window",
   "phaseLuteal": "Luteal",
-  "periodLoggedSuccess": "Period logged — prediction updated"
+  "periodLoggedSuccess": "Period logged — prediction updated",
+  "liveIsland": "Dynamic Island",
+  "liveIslandSubtitle": "Show strawberry + count on the island while the app is open (decorative, clears when you close the app)"
 }

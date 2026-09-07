@@ -488,4 +488,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get periodLoggedSuccess => 'Period logged — prediction updated';
+
+  @override
+  String get liveIsland => 'Dynamic Island';
+
+  @override
+  String get liveIslandSubtitle =>
+      'Show strawberry + count on the island while the app is open (decorative, clears when you close the app)';
 }

@@ -12,15 +12,31 @@ class HiveService {
   bool _isInitialized = false;
 
   Future<void> init() async {
-    if (_isInitialized) return;
+    if (!_isInitialized) {
+      await Hive.initFlutter();
 
-    await Hive.initFlutter();
+      if (!Hive.isAdapterRegistered(0)) {
+        Hive.registerAdapter(CycleModelAdapter());
+      }
 
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(CycleModelAdapter());
+      _isInitialized = true;
     }
 
-    _isInitialized = true;
+    await ensureCoreBoxesOpen();
+  }
+
+  /// Opens boxes that first-frame providers read via [Hive.box].
+  Future<void> ensureCoreBoxesOpen() async {
+    if (!Hive.isBoxOpen(AppConstants.settingsBoxName)) {
+      await openBox(AppConstants.settingsBoxName);
+    }
+  }
+
+  Box? peekOpenSettingsBox() {
+    if (!Hive.isBoxOpen(AppConstants.settingsBoxName)) {
+      return null;
+    }
+    return Hive.box(AppConstants.settingsBoxName);
   }
 
   Future<Box<T>> openEncryptedBox<T>(
@@ -54,3 +70,10 @@ final settingsBoxProvider = FutureProvider<Box>((ref) async {
   final hiveService = ref.watch(hiveServiceProvider);
   return await hiveService.openBox(AppConstants.settingsBoxName);
 });
+
+/// Settings box for sync providers. Null only while [settingsBoxProvider] is
+/// still opening and [HiveService.ensureCoreBoxesOpen] has not run yet.
+Box? resolvedSettingsBox(Ref ref) {
+  return ref.watch(settingsBoxProvider).value ??
+      ref.read(hiveServiceProvider).peekOpenSettingsBox();
+}

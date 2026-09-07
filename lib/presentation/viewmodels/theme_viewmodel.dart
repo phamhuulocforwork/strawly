@@ -5,23 +5,25 @@ import '../../core/constants/app_constants.dart';
 import '../../core/di/hive_service.dart';
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  final Box settingsBox;
+  final Box? settingsBox;
 
   ThemeModeNotifier(this.settingsBox) : super(ThemeMode.system) {
     _loadThemeMode();
   }
 
   void _loadThemeMode() {
+    final box = settingsBox;
+    if (box == null) return;
+
     final isDark =
-        settingsBox.get(AppConstants.isDarkModeKey, defaultValue: false)
-            as bool;
+        box.get(AppConstants.isDarkModeKey, defaultValue: false) as bool;
 
     state = isDark ? ThemeMode.dark : ThemeMode.light;
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
     state = mode;
-    await settingsBox.put(AppConstants.isDarkModeKey, mode == ThemeMode.dark);
+    await settingsBox?.put(AppConstants.isDarkModeKey, mode == ThemeMode.dark);
   }
 
   Future<void> toggleTheme() async {
@@ -33,11 +35,5 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
   ref,
 ) {
-  final settingsBox = ref.watch(settingsBoxProvider).value;
-
-  if (settingsBox == null) {
-    return ThemeModeNotifier(Hive.box(AppConstants.settingsBoxName));
-  }
-
-  return ThemeModeNotifier(settingsBox);
+  return ThemeModeNotifier(resolvedSettingsBox(ref));
 });

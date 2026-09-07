@@ -11,28 +11,25 @@ class LocalePreferenceNotifier extends StateNotifier<LocalePreference> {
     _loadPreference();
   }
 
-  final Box settingsBox;
+  final Box? settingsBox;
 
   void _loadPreference() {
-    final value = settingsBox.get(AppConstants.localePreferenceKey) as String?;
+    final box = settingsBox;
+    if (box == null) return;
+
+    final value = box.get(AppConstants.localePreferenceKey) as String?;
     state = LocalePreference.fromStorage(value);
   }
 
   Future<void> setPreference(LocalePreference preference) async {
     state = preference;
-    await settingsBox.put(AppConstants.localePreferenceKey, preference.name);
+    await settingsBox?.put(AppConstants.localePreferenceKey, preference.name);
   }
 }
 
 final localePreferenceProvider =
     StateNotifierProvider<LocalePreferenceNotifier, LocalePreference>((ref) {
-  final settingsBox = ref.watch(settingsBoxProvider).value;
-
-  if (settingsBox == null) {
-    return LocalePreferenceNotifier(Hive.box(AppConstants.settingsBoxName));
-  }
-
-  return LocalePreferenceNotifier(settingsBox);
+  return LocalePreferenceNotifier(resolvedSettingsBox(ref));
 });
 
 /// Resolves the effective locale for formatting and lookups.

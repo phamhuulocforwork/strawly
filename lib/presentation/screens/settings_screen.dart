@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
+import '../viewmodels/live_island_settings_viewmodel.dart';
 import '../viewmodels/locale_viewmodel.dart';
 import '../viewmodels/theme_viewmodel.dart';
 import '../widgets/bento_tile.dart';
@@ -21,6 +22,7 @@ class SettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final themeMode = ref.watch(themeModeProvider);
     final localePreference = ref.watch(localePreferenceProvider);
+    final liveIslandEnabled = ref.watch(liveIslandEnabledProvider);
 
     return SafeArea(
       child: ListView(
@@ -113,6 +115,28 @@ class SettingsScreen extends ConsumerWidget {
                     },
                   ),
                 ],
+              ),
+            ),
+          ),
+          const SizedBox(height: BentoTokens.space12),
+          BentoTile(
+            label: l10n.liveIsland,
+            child: Material(
+              color: Colors.transparent,
+              child: SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  AppIcons.home,
+                  color: BentoTokens.onSurfaceText(context),
+                ),
+                title: Text(l10n.liveIsland),
+                subtitle: Text(l10n.liveIslandSubtitle),
+                value: liveIslandEnabled,
+                onChanged: (value) {
+                  ref
+                      .read(liveIslandEnabledProvider.notifier)
+                      .setEnabled(value);
+                },
               ),
             ),
           ),

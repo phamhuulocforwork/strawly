@@ -9,6 +9,7 @@ import 'l10n/app_localizations.dart';
 import 'presentation/shell/app_shell.dart';
 import 'presentation/viewmodels/locale_viewmodel.dart';
 import 'presentation/viewmodels/theme_viewmodel.dart';
+import 'presentation/widgets/live_island_lifecycle_host.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,7 +56,9 @@ class MyApp extends ConsumerWidget {
           },
           home: const AppShell(),
           builder: (context, child) {
-            return ShadAppBuilder(child: child!);
+            return ShadAppBuilder(
+              child: LiveIslandLifecycleHost(child: child!),
+            );
           },
         );
       },

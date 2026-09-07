@@ -14,6 +14,12 @@ class AppConstants {
   static const String isPinEnabledKey = 'is_pin_enabled';
   static const String userPinKey = 'user_pin';
   static const String isBiometricEnabledKey = 'is_biometric_enabled';
+  static const String liveIslandEnabledKey = 'live_island_enabled';
+
+  // OS Live Activity / Super Island (decorative, process-bound)
+  static const String liveIslandActivityId = 'strawly-cycle';
+  static const String liveIslandAppGroupId = 'group.com.example.strawly';
+  static const String liveIslandUrlScheme = 'strawly';
 
   // Cycle Prediction
   static const int defaultCycleLength = 28;

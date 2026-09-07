@@ -470,4 +470,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get periodLoggedSuccess => 'Đã ghi nhận kỳ kinh — dự đoán đã cập nhật';
+
+  @override
+  String get liveIsland => 'Dynamic Island';
+
+  @override
+  String get liveIslandSubtitle =>
+      'Hiện dâu + số trên island khi em mở app (chỉ để đẹp, tắt khi đóng app)';
 }

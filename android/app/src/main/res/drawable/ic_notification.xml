@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Strawberry silhouette (tinted white on the island chip). -->
+    <path
+        android:fillColor="#FFC44B6A"
+        android:pathData="M12,1.8C10.8,3.2 9.2,4 7.2,4.2C7.6,7 9.3,8.6 11,9.8C8.2,11.1 5.5,14.2 5.5,17.6C5.5,20.8 8.2,23.2 12,23.2C15.8,23.2 18.5,20.8 18.5,17.6C18.5,14.2 15.8,11.1 13,9.8C14.7,8.6 16.4,7 16.8,4.2C14.8,4 13.2,3.2 12,1.8Z" />
+</vector>

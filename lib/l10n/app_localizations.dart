@@ -937,6 +937,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Period logged — prediction updated'**
   String get periodLoggedSuccess;
+
+  /// No description provided for @liveIsland.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic Island'**
+  String get liveIsland;
+
+  /// No description provided for @liveIslandSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show strawberry + count on the island while the app is open (decorative, clears when you close the app)'**
+  String get liveIslandSubtitle;
 }
 
 class _AppLocalizationsDelegate
