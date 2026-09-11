@@ -74,6 +74,14 @@ class HomeScreen extends ConsumerWidget {
         SnackBar(
           content: Text(l10n.cycleDeleted),
           backgroundColor: BentoTokens.warning,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: l10n.undo,
+            textColor: Colors.white,
+            onPressed: () {
+              ref.read(cycleListProvider.notifier).addCycle(cycle);
+            },
+          ),
         ),
       );
     } catch (e) {
@@ -82,6 +90,7 @@ class HomeScreen extends ConsumerWidget {
         SnackBar(
           content: Text(l10n.deleteFailed(e.toString())),
           backgroundColor: BentoTokens.danger,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }

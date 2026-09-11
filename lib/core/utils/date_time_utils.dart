@@ -13,6 +13,11 @@ class DateTimeUtils {
     return DateFormat.yMd(locale).format(date);
   }
 
+  /// Compact day/month label for chart axes (e.g., "15/1"), locale-safe.
+  static String formatDayMonth(DateTime date, [String? locale]) {
+    return DateFormat('d/M', locale).format(date);
+  }
+
   /// Month and year header for calendars (e.g., "September 2026").
   static String formatMonthYear(DateTime date, [String? locale]) {
     return DateFormat('MMMM yyyy', locale).format(date);

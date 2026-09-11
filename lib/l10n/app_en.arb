@@ -155,8 +155,14 @@
   "privacySubtitle": "All data stored locally on device",
   "security": "Security",
   "securitySubtitle": "Data encrypted with AES-256",
-  "brandingSubtitle": "Your private menstrual cycle tracker",
-  "strawlyBranding": "Strawly branding",
+  "debug": "Debug",
+  "debugEnabled": "Debug mode enabled",
+  "debugDisabled": "Debug mode disabled",
+  "debugPeriodReminder": "Period reminder — send test",
+  "debugPrintCycles": "Print cycles to console",
+  "debugCancelReminder": "Cancel scheduled reminder",
+  "debugReminderCancelled": "Scheduled reminder cancelled",
+  "debugExit": "Exit debug mode",
   "dataExported": "Data exported to clipboard",
   "exportFailed": "Export failed: {error}",
   "@exportFailed": {
@@ -290,5 +296,21 @@
   "phaseLuteal": "Luteal",
   "periodLoggedSuccess": "Period logged — prediction updated",
   "liveIsland": "Dynamic Island",
-  "liveIslandSubtitle": "Show strawberry + count on the island while the app is open (decorative, clears when you close the app)"
+  "undo": "Undo",
+  "loadingStatistics": "Loading statistics",
+  "reminders": "Period reminders",
+  "remindersSubtitle": "Get notified before your predicted period",
+  "remindLeadDays": "{days, plural, =0{On the day} =1{1 day before} other{{days} days before}}",
+  "@remindLeadDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "reminderNotificationBody": "Your period is expected on {date}.",
+  "@reminderNotificationBody": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "reminderPermissionDenied": "Notification permission denied"
 }

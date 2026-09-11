@@ -6,6 +6,7 @@ import '../../domain/entities/cycle.dart';
 import '../../domain/entities/cycle_statistics.dart';
 import '../../domain/usecases/statistics_calculations.dart';
 import '../../l10n/app_localizations.dart';
+import 'add_cycle_screen.dart';
 import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
@@ -26,7 +27,18 @@ class StatisticsScreen extends ConsumerWidget {
 
     return SafeArea(
       child: statisticsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(BentoTokens.space16),
+            children: [
+              BentoTile(
+                label: l10n.loadingStatistics,
+                isLoading: true,
+                child: const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
         error: (error, stack) => Center(
           child: Padding(
             padding: const EdgeInsets.all(BentoTokens.space16),
@@ -76,6 +88,23 @@ class StatisticsScreen extends ConsumerWidget {
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                             color: BentoTokens.mutedText(context),
+                          ),
+                        ),
+                        const SizedBox(height: BentoTokens.space16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AddCycleScreen(),
+                              ),
+                            ),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: BentoTokens.primaryButton,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: Text(l10n.addCycle),
                           ),
                         ),
                       ],
@@ -210,10 +239,10 @@ class StatisticsScreen extends ConsumerWidget {
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            DateTimeUtils.formatDateShort(
+                            DateTimeUtils.formatDayMonth(
                               completeCycles[index].startDate,
                               locale,
-                            ).substring(0, 5),
+                            ),
                             style: Theme.of(context).textTheme.labelSmall,
                           ),
                         );

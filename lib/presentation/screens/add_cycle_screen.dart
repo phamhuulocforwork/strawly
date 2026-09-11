@@ -310,6 +310,7 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
                 : l10n.cycleAddedSuccess,
           ),
           backgroundColor: BentoTokens.success,
+          behavior: SnackBarBehavior.floating,
         ),
       );
 
@@ -324,6 +325,7 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
           SnackBar(
             content: Text(l10n.errorMessage(e.toString())),
             backgroundColor: BentoTokens.danger,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }

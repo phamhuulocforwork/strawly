@@ -58,12 +58,17 @@ dependencies:
   # Security
   local_auth: ^2.3.0
 
+  # Notifications
+  flutter_local_notifications: ^19.4.1
+  timezone: ^0.10.1
+
   # Icons (version required by shadcn_ui)
   lucide_icons_flutter: ^3.1.18
   equatable: ^2.0.7
   uuid: ^4.5.1
   path_provider: ^2.1.5
   live_activities: ^2.5.1
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +84,7 @@ dev_dependencies:
   # Hive Generator
   hive_generator: ^2.0.1
   build_runner: ^2.4.13
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -94,6 +100,7 @@ flutter:
 
   assets:
     - assets/images/stickers/
+    - assets/svgs/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -120,3 +127,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/logo-app-icon.png"
+  adaptive_icon_foreground: "assets/icon/logo-foreground.png"
+  adaptive_icon_background: "#FFFBF7"
+  min_sdk_android: 21

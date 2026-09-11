@@ -15,6 +15,8 @@ class AppConstants {
   static const String userPinKey = 'user_pin';
   static const String isBiometricEnabledKey = 'is_biometric_enabled';
   static const String liveIslandEnabledKey = 'live_island_enabled';
+  static const String reminderEnabledKey = 'reminder_enabled';
+  static const String reminderLeadDaysKey = 'reminder_lead_days';
 
   // OS Live Activity / Super Island (decorative, process-bound)
   static const String liveIslandActivityId = 'strawly-cycle';

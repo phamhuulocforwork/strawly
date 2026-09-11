@@ -271,10 +271,28 @@ class AppLocalizationsVi extends AppLocalizations {
   String get securitySubtitle => 'Dữ liệu được mã hóa AES-256';
 
   @override
-  String get brandingSubtitle => 'Theo dõi chu kỳ riêng tư — dành riêng cho em';
+  String get debug => 'Gỡ lỗi';
 
   @override
-  String get strawlyBranding => 'Strawly';
+  String get debugEnabled => 'Đã bật chế độ gỡ lỗi';
+
+  @override
+  String get debugDisabled => 'Đã tắt chế độ gỡ lỗi';
+
+  @override
+  String get debugPeriodReminder => 'Nhắc kỳ kinh — gửi thử';
+
+  @override
+  String get debugPrintCycles => 'In cycles ra console';
+
+  @override
+  String get debugCancelReminder => 'Hủy lịch nhắc đã đặt';
+
+  @override
+  String get debugReminderCancelled => 'Đã hủy lịch nhắc';
+
+  @override
+  String get debugExit => 'Thoát chế độ gỡ lỗi';
 
   @override
   String get dataExported => 'Đã sao lưu vào clipboard rồi nhé';
@@ -475,6 +493,33 @@ class AppLocalizationsVi extends AppLocalizations {
   String get liveIsland => 'Dynamic Island';
 
   @override
-  String get liveIslandSubtitle =>
-      'Hiện dâu + số trên island khi em mở app (chỉ để đẹp, tắt khi đóng app)';
+  String get undo => 'Hoàn tác';
+
+  @override
+  String get loadingStatistics => 'Đang tải thống kê...';
+
+  @override
+  String get reminders => 'Nhắc kỳ kinh';
+
+  @override
+  String get remindersSubtitle => 'Nhận thông báo trước kỳ kinh dự kiến';
+
+  @override
+  String remindLeadDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days ngày trước',
+      zero: 'Cùng ngày',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderNotificationBody(String date) {
+    return 'Kỳ kinh của mình dự kiến vào $date nhé.';
+  }
+
+  @override
+  String get reminderPermissionDenied => 'Chưa cấp quyền thông báo';
 }

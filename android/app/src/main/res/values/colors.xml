@@ -2,4 +2,5 @@
 <resources>
     <color name="live_island_text">#FF2D2D2D</color>
     <color name="live_island_muted">#992D2D2D</color>
+	<color name="ic_launcher_background">#FFFBF7</color>
 </resources>

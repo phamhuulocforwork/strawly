@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
@@ -109,6 +110,7 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
   Future<void> _onLogPeriod(AppLocalizations l10n) async {
     if (_isLogging || _loggedToday) return;
 
+    HapticFeedback.lightImpact();
     setState(() => _buttonScale = 0.96);
     await Future<void>.delayed(const Duration(milliseconds: 150));
     if (!mounted) return;
@@ -137,6 +139,7 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
         SnackBar(
           content: Text(l10n.periodLoggedSuccess),
           backgroundColor: BentoTokens.success,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } catch (e) {
@@ -145,6 +148,7 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
           SnackBar(
             content: Text(l10n.errorMessage(e.toString())),
             backgroundColor: BentoTokens.danger,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }

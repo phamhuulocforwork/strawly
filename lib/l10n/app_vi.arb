@@ -80,8 +80,14 @@
   "privacySubtitle": "Mọi thứ chỉ lưu trên máy em, không ai khác thấy đâu",
   "security": "Bảo mật",
   "securitySubtitle": "Dữ liệu được mã hóa AES-256",
-  "brandingSubtitle": "Theo dõi chu kỳ riêng tư — dành riêng cho em",
-  "strawlyBranding": "Strawly",
+  "debug": "Gỡ lỗi",
+  "debugEnabled": "Đã bật chế độ gỡ lỗi",
+  "debugDisabled": "Đã tắt chế độ gỡ lỗi",
+  "debugPeriodReminder": "Nhắc kỳ kinh — gửi thử",
+  "debugPrintCycles": "In cycles ra console",
+  "debugCancelReminder": "Hủy lịch nhắc đã đặt",
+  "debugReminderCancelled": "Đã hủy lịch nhắc",
+  "debugExit": "Thoát chế độ gỡ lỗi",
   "dataExported": "Đã sao lưu vào clipboard rồi nhé",
   "exportFailed": "Xuất không được: {error}",
   "importDataTitle": "Nhập dữ liệu",
@@ -166,5 +172,21 @@
   "phaseLuteal": "Hoàng thể",
   "periodLoggedSuccess": "Đã ghi nhận kỳ kinh — dự đoán đã cập nhật",
   "liveIsland": "Dynamic Island",
-  "liveIslandSubtitle": "Hiện dâu + số trên island khi em mở app (chỉ để đẹp, tắt khi đóng app)"
+  "undo": "Hoàn tác",
+  "loadingStatistics": "Đang tải thống kê...",
+  "reminders": "Nhắc kỳ kinh",
+  "remindersSubtitle": "Nhận thông báo trước kỳ kinh dự kiến",
+  "remindLeadDays": "{days, plural, =0{Cùng ngày} other{{days} ngày trước}}",
+  "@remindLeadDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "reminderNotificationBody": "Kỳ kinh của mình dự kiến vào {date} nhé.",
+  "@reminderNotificationBody": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "reminderPermissionDenied": "Chưa cấp quyền thông báo"
 }

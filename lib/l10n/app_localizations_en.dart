@@ -289,10 +289,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securitySubtitle => 'Data encrypted with AES-256';
 
   @override
-  String get brandingSubtitle => 'Your private menstrual cycle tracker';
+  String get debug => 'Debug';
 
   @override
-  String get strawlyBranding => 'Strawly branding';
+  String get debugEnabled => 'Debug mode enabled';
+
+  @override
+  String get debugDisabled => 'Debug mode disabled';
+
+  @override
+  String get debugPeriodReminder => 'Period reminder — send test';
+
+  @override
+  String get debugPrintCycles => 'Print cycles to console';
+
+  @override
+  String get debugCancelReminder => 'Cancel scheduled reminder';
+
+  @override
+  String get debugReminderCancelled => 'Scheduled reminder cancelled';
+
+  @override
+  String get debugExit => 'Exit debug mode';
 
   @override
   String get dataExported => 'Data exported to clipboard';
@@ -493,6 +511,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveIsland => 'Dynamic Island';
 
   @override
-  String get liveIslandSubtitle =>
-      'Show strawberry + count on the island while the app is open (decorative, clears when you close the app)';
+  String get undo => 'Undo';
+
+  @override
+  String get loadingStatistics => 'Loading statistics';
+
+  @override
+  String get reminders => 'Period reminders';
+
+  @override
+  String get remindersSubtitle => 'Get notified before your predicted period';
+
+  @override
+  String remindLeadDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days before',
+      one: '1 day before',
+      zero: 'On the day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderNotificationBody(String date) {
+    return 'Your period is expected on $date.';
+  }
+
+  @override
+  String get reminderPermissionDenied => 'Notification permission denied';
 }

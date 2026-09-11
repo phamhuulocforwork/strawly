@@ -6,7 +6,7 @@ import 'core/di/hive_service.dart';
 import 'core/l10n/locale_support.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
-import 'presentation/shell/app_shell.dart';
+import 'presentation/screens/splash_screen.dart';
 import 'presentation/viewmodels/locale_viewmodel.dart';
 import 'presentation/viewmodels/theme_viewmodel.dart';
 import 'presentation/widgets/live_island_lifecycle_host.dart';
@@ -54,7 +54,7 @@ class MyApp extends ConsumerWidget {
               locales ?? const [Locale('en')],
             );
           },
-          home: const AppShell(),
+          home: const SplashScreen(),
           builder: (context, child) {
             return ShadAppBuilder(
               child: LiveIslandLifecycleHost(child: child!),

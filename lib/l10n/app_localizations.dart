@@ -578,17 +578,53 @@ abstract class AppLocalizations {
   /// **'Data encrypted with AES-256'**
   String get securitySubtitle;
 
-  /// No description provided for @brandingSubtitle.
+  /// No description provided for @debug.
   ///
   /// In en, this message translates to:
-  /// **'Your private menstrual cycle tracker'**
-  String get brandingSubtitle;
+  /// **'Debug'**
+  String get debug;
 
-  /// No description provided for @strawlyBranding.
+  /// No description provided for @debugEnabled.
   ///
   /// In en, this message translates to:
-  /// **'Strawly branding'**
-  String get strawlyBranding;
+  /// **'Debug mode enabled'**
+  String get debugEnabled;
+
+  /// No description provided for @debugDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug mode disabled'**
+  String get debugDisabled;
+
+  /// No description provided for @debugPeriodReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Period reminder — send test'**
+  String get debugPeriodReminder;
+
+  /// No description provided for @debugPrintCycles.
+  ///
+  /// In en, this message translates to:
+  /// **'Print cycles to console'**
+  String get debugPrintCycles;
+
+  /// No description provided for @debugCancelReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel scheduled reminder'**
+  String get debugCancelReminder;
+
+  /// No description provided for @debugReminderCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled reminder cancelled'**
+  String get debugReminderCancelled;
+
+  /// No description provided for @debugExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit debug mode'**
+  String get debugExit;
 
   /// No description provided for @dataExported.
   ///
@@ -944,11 +980,47 @@ abstract class AppLocalizations {
   /// **'Dynamic Island'**
   String get liveIsland;
 
-  /// No description provided for @liveIslandSubtitle.
+  /// No description provided for @undo.
   ///
   /// In en, this message translates to:
-  /// **'Show strawberry + count on the island while the app is open (decorative, clears when you close the app)'**
-  String get liveIslandSubtitle;
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @loadingStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading statistics'**
+  String get loadingStatistics;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Period reminders'**
+  String get reminders;
+
+  /// No description provided for @remindersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified before your predicted period'**
+  String get remindersSubtitle;
+
+  /// No description provided for @remindLeadDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{On the day} =1{1 day before} other{{days} days before}}'**
+  String remindLeadDays(int days);
+
+  /// No description provided for @reminderNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your period is expected on {date}.'**
+  String reminderNotificationBody(String date);
+
+  /// No description provided for @reminderPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission denied'**
+  String get reminderPermissionDenied;
 }
 
 class _AppLocalizationsDelegate

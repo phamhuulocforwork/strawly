@@ -5,11 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../core/di/providers.dart';
 import '../../core/l10n/locale_support.dart';
+import '../../core/services/reminder_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
+import '../viewmodels/debug_mode_viewmodel.dart';
 import '../viewmodels/live_island_settings_viewmodel.dart';
+import '../viewmodels/reminder_settings_viewmodel.dart';
 import '../viewmodels/locale_viewmodel.dart';
 import '../viewmodels/theme_viewmodel.dart';
 import '../widgets/bento_tile.dart';
@@ -23,6 +26,9 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final localePreference = ref.watch(localePreferenceProvider);
     final liveIslandEnabled = ref.watch(liveIslandEnabledProvider);
+    final reminderEnabled = ref.watch(reminderEnabledProvider);
+    final reminderLeadDays = ref.watch(reminderLeadDaysProvider);
+    final debugMode = ref.watch(debugModeProvider);
 
     return SafeArea(
       child: ListView(
@@ -130,13 +136,58 @@ class SettingsScreen extends ConsumerWidget {
                   color: BentoTokens.onSurfaceText(context),
                 ),
                 title: Text(l10n.liveIsland),
-                subtitle: Text(l10n.liveIslandSubtitle),
                 value: liveIslandEnabled,
                 onChanged: (value) {
                   ref
                       .read(liveIslandEnabledProvider.notifier)
                       .setEnabled(value);
                 },
+              ),
+            ),
+          ),
+          const SizedBox(height: BentoTokens.space12),
+          BentoTile(
+            label: l10n.reminders,
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    secondary: Icon(
+                      AppIcons.bell,
+                      color: BentoTokens.onSurfaceText(context),
+                    ),
+                    title: Text(l10n.reminders),
+                    subtitle: Text(l10n.remindersSubtitle),
+                    value: reminderEnabled,
+                    onChanged: (value) =>
+                        _toggleReminders(context, ref, l10n, value),
+                  ),
+                  if (reminderEnabled) ...[
+                    const Divider(height: 1),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: BentoTokens.space12,
+                      ),
+                      child: SegmentedButton<int>(
+                        segments: [
+                          for (final days in const [0, 1, 2])
+                            ButtonSegment(
+                              value: days,
+                              label: Text(l10n.remindLeadDays(days)),
+                            ),
+                        ],
+                        selected: {reminderLeadDays},
+                        onSelectionChanged: (selection) {
+                          ref
+                              .read(reminderLeadDaysProvider.notifier)
+                              .setLeadDays(selection.first);
+                        },
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
@@ -206,6 +257,20 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     title: Text(l10n.version),
                     subtitle: Text(l10n.versionNumber),
+                    onTap: () {
+                      final justEnabled = ref
+                          .read(debugModeProvider.notifier)
+                          .tapVersion();
+                      if (justEnabled && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.debugEnabled),
+                            backgroundColor: BentoTokens.success,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    },
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -231,33 +296,66 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: BentoTokens.space24),
-          BentoTile(
-            label: l10n.strawlyBranding,
-            variant: BentoTileVariant.primary,
-            child: Column(
-              children: [
-                Icon(
-                  AppIcons.heart,
-                  color: BentoTokens.onSurfaceText(context),
-                  size: 40,
+          if (debugMode) ...[
+            const SizedBox(height: BentoTokens.space24),
+            _buildSectionHeader(context, l10n.debug),
+            BentoTile(
+              label: l10n.debug,
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        AppIcons.bell,
+                        color: BentoTokens.onSurfaceText(context),
+                      ),
+                      title: Text(l10n.debugPeriodReminder),
+                      trailing: const Icon(AppIcons.chevronRight),
+                      onTap: () =>
+                          _sendPeriodReminderTest(context, ref, l10n),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        AppIcons.info,
+                        color: BentoTokens.onSurfaceText(context),
+                      ),
+                      title: Text(l10n.debugPrintCycles),
+                      trailing: const Icon(AppIcons.chevronRight),
+                      onTap: () => _printCycles(ref),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        AppIcons.bellOff,
+                        color: BentoTokens.onSurfaceText(context),
+                      ),
+                      title: Text(l10n.debugCancelReminder),
+                      trailing: const Icon(AppIcons.chevronRight),
+                      onTap: () => _cancelReminder(context, l10n),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(
+                        AppIcons.logOut,
+                        color: BentoTokens.danger,
+                      ),
+                      title: Text(
+                        l10n.debugExit,
+                        style: const TextStyle(color: BentoTokens.danger),
+                      ),
+                      onTap: () => _exitDebugMode(context, ref, l10n),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: BentoTokens.space8),
-                Text(
-                  l10n.appName,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: BentoTokens.space4),
-                Text(
-                  l10n.brandingSubtitle,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: BentoTokens.mutedText(context),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
           const SizedBox(height: BentoTokens.space32),
         ],
       ),
@@ -280,6 +378,98 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _toggleReminders(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    bool value,
+  ) async {
+    var effective = value;
+    if (value) {
+      final granted = await ReminderService.requestPermission();
+      if (!context.mounted) return;
+      if (!granted) {
+        effective = false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.reminderPermissionDenied),
+            backgroundColor: BentoTokens.danger,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+    await ref.read(reminderEnabledProvider.notifier).setEnabled(effective);
+  }
+
+  Future<void> _sendPeriodReminderTest(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final granted = await ReminderService.requestPermission();
+    if (!context.mounted) return;
+    if (!granted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.reminderPermissionDenied),
+          backgroundColor: BentoTokens.danger,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    final predicted = await ref.read(predictedNextCycleDateProvider.future);
+    if (!context.mounted) return;
+    final (title, body) = ReminderService.periodReminderPayload(
+      l10n,
+      predicted ?? DateTime.now(),
+      Localizations.localeOf(context).toString(),
+    );
+    await ReminderService.showNotification(title: title, body: body);
+  }
+
+  void _printCycles(WidgetRef ref) {
+    final cycles = ref.read(cycleListProvider).cycles;
+    debugPrint('Strawly debug: ${cycles.length} cycles');
+    for (final cycle in cycles) {
+      debugPrint(
+        '  ${cycle.id} start=${cycle.startDate.toIso8601String()} '
+        'length=${cycle.cycleLength} period=${cycle.periodDuration}',
+      );
+    }
+  }
+
+  Future<void> _cancelReminder(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    await ReminderService.cancelReminder();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.debugReminderCancelled),
+        backgroundColor: BentoTokens.warning,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _exitDebugMode(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    ref.read(debugModeProvider.notifier).setEnabled(false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.debugDisabled),
+        backgroundColor: BentoTokens.warning,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Future<void> _exportData(
     BuildContext context,
     WidgetRef ref,
@@ -298,6 +488,7 @@ class SettingsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(l10n.dataExported),
           backgroundColor: BentoTokens.success,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } catch (e) {
@@ -306,6 +497,7 @@ class SettingsScreen extends ConsumerWidget {
           SnackBar(
             content: Text(l10n.exportFailed(e.toString())),
             backgroundColor: BentoTokens.danger,
+          behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -385,6 +577,7 @@ class SettingsScreen extends ConsumerWidget {
           SnackBar(
             content: Text(l10n.importedCycles(cycles.length)),
             backgroundColor: BentoTokens.success,
+          behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -394,6 +587,7 @@ class SettingsScreen extends ConsumerWidget {
           SnackBar(
             content: Text(l10n.importFailed(e.toString())),
             backgroundColor: BentoTokens.danger,
+          behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -438,6 +632,7 @@ class SettingsScreen extends ConsumerWidget {
           SnackBar(
             content: Text(l10n.allDataDeleted),
             backgroundColor: BentoTokens.warning,
+          behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -447,6 +642,7 @@ class SettingsScreen extends ConsumerWidget {
           SnackBar(
             content: Text(l10n.deleteFailed(e.toString())),
             backgroundColor: BentoTokens.danger,
+          behavior: SnackBarBehavior.floating,
           ),
         );
       }

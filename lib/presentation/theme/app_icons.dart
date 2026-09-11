@@ -30,4 +30,7 @@ abstract final class AppIcons {
   static const privacy = LucideIcons.shield;
   static const lock = LucideIcons.lock;
   static const heart = LucideIcons.heart;
+  static const bell = LucideIcons.bell;
+  static const bellOff = LucideIcons.bellOff;
+  static const logOut = LucideIcons.logOut;
 }
