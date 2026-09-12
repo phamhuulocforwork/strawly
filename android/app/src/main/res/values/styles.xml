@@ -15,4 +15,24 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+
+    <style name="WidgetCalCell">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/cal_day_none</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/widget_text</item>
+        <item name="android:textSize">8sp</item>
+    </style>
+
+    <style name="WidgetCalWeekday">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/widget_muted</item>
+        <item name="android:textSize">7sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

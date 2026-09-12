@@ -4,7 +4,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/di/hive_service.dart';
 
 class LiveIslandSettingsNotifier extends StateNotifier<bool> {
-  LiveIslandSettingsNotifier(this.settingsBox) : super(true) {
+  LiveIslandSettingsNotifier(this.settingsBox) : super(false) {
     _loadPreference();
   }
 
@@ -16,9 +16,9 @@ class LiveIslandSettingsNotifier extends StateNotifier<bool> {
 
     final value = box.get(
       AppConstants.liveIslandEnabledKey,
-      defaultValue: true,
+      defaultValue: false,
     );
-    state = value is bool ? value : true;
+    state = value is bool ? value : false;
   }
 
   Future<void> setEnabled(bool enabled) async {

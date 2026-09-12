@@ -475,6 +475,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loggedPeriodToday => 'Đã ghi nhận hôm nay';
 
   @override
+  String get widgetPhaseTitle => 'Hôm nay';
+
+  @override
   String get phasePeriod => 'Kỳ kinh';
 
   @override

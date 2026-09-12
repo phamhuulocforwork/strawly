@@ -1,6 +1,7 @@
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../../domain/entities/cycle.dart';
+import '../../l10n/app_localizations.dart';
 
 enum CalendarDayKind { none, period, fertile, predicted }
 
@@ -169,3 +170,14 @@ class CycleCalendarLogic {
 }
 
 enum CyclePhase { period, follicular, fertile, luteal }
+
+extension CyclePhaseLabel on CyclePhase {
+  String label(AppLocalizations l10n) {
+    return switch (this) {
+      CyclePhase.period => l10n.phasePeriod,
+      CyclePhase.follicular => l10n.phaseFollicular,
+      CyclePhase.fertile => l10n.phaseFertile,
+      CyclePhase.luteal => l10n.phaseLuteal,
+    };
+  }
+}

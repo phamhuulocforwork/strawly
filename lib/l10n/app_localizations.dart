@@ -944,6 +944,12 @@ abstract class AppLocalizations {
   /// **'Logged today'**
   String get loggedPeriodToday;
 
+  /// No description provided for @widgetPhaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Phase'**
+  String get widgetPhaseTitle;
+
   /// No description provided for @phasePeriod.
   ///
   /// In en, this message translates to:

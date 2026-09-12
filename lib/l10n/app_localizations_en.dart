@@ -493,6 +493,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loggedPeriodToday => 'Logged today';
 
   @override
+  String get widgetPhaseTitle => 'Phase';
+
+  @override
   String get phasePeriod => 'Period';
 
   @override

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_background">#FF1A1A1A</color>
+    <color name="widget_text">#FFE8E8E8</color>
+    <color name="widget_muted">#99E8E8E8</color>
+    <color name="widget_badge_text">#FF1A1A1A</color>
+    <color name="widget_wash_none">#FF1A1A1A</color>
+    <color name="widget_wash_period">#FF3A2428</color>
+    <color name="widget_wash_fertile">#FF1F2A22</color>
+    <color name="widget_wash_follicular">#FF1A2430</color>
+    <color name="widget_wash_luteal">#FF26203A</color>
+    <color name="phase_period">#FFD97B8F</color>
+    <color name="phase_fertile">#FF86EFAC</color>
+    <color name="phase_follicular">#FF6CB4FF</color>
+    <color name="phase_luteal">#FFA49DFF</color>
+
+    <color name="cal_day_period">#FF5C3A44</color>
+    <color name="cal_day_fertile">#FF2A4555</color>
+    <color name="cal_day_predicted">#FF5C4A2A</color>
+    <color name="cal_day_fertile_text">#FF7BB8D9</color>
+    <color name="cal_day_today_ring">#FFD97B8F</color>
+    <color name="stat_bar_fill">#FF7BB8D9</color>
+</resources>

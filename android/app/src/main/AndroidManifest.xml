@@ -36,6 +36,39 @@
             android:name=".StrawlyLiveIslandService"
             android:exported="false"
             android:stopWithTask="false" />
+        <receiver
+            android:name=".CycleWidgetBarProvider"
+            android:exported="false"
+            android:label="Strawly">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/cycle_widget_strip" />
+        </receiver>
+        <receiver
+            android:name=".CycleWidget2x2Provider"
+            android:exported="false"
+            android:label="Strawly 2×2">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/cycle_widget_2x2" />
+        </receiver>
+        <receiver
+            android:name=".CycleWidget2x3Provider"
+            android:exported="false"
+            android:label="Strawly Calendar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/cycle_widget_2x2_calendar" />
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

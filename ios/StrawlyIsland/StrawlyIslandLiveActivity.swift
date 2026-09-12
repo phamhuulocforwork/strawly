@@ -5,6 +5,7 @@ import WidgetKit
 @main
 struct StrawlyIslandBundle: WidgetBundle {
   var body: some Widget {
+    StrawlyHomeWidget()
     if #available(iOS 16.1, *) {
       StrawlyIslandLiveActivity()
     }

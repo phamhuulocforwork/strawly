@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cal_cell_0"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_1"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_2"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_3"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_4"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_5"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_6"
+            style="@style/WidgetCalCell" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cal_cell_7"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_8"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_9"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_10"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_11"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_12"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_13"
+            style="@style/WidgetCalCell" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cal_cell_14"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_15"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_16"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_17"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_18"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_19"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_20"
+            style="@style/WidgetCalCell" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cal_cell_21"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_22"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_23"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_24"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_25"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_26"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_27"
+            style="@style/WidgetCalCell" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cal_cell_28"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_29"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_30"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_31"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_32"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_33"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_34"
+            style="@style/WidgetCalCell" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cal_cell_35"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_36"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_37"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_38"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_39"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_40"
+            style="@style/WidgetCalCell" />
+
+        <TextView
+            android:id="@+id/cal_cell_41"
+            style="@style/WidgetCalCell" />
+    </LinearLayout>
+</LinearLayout>

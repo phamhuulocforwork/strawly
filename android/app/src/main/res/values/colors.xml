@@ -2,5 +2,28 @@
 <resources>
     <color name="live_island_text">#FF2D2D2D</color>
     <color name="live_island_muted">#992D2D2D</color>
-	<color name="ic_launcher_background">#FFFBF7</color>
+    <color name="ic_launcher_background">#FFFBF7</color>
+
+    <!-- Home widget -->
+    <color name="widget_background">#FFFBF7</color>
+    <color name="widget_text">#FF2D2D2D</color>
+    <color name="widget_muted">#992D2D2D</color>
+    <color name="widget_badge_text">#FFFBF7</color>
+    <color name="widget_wash_none">#FFFBF7</color>
+    <color name="widget_wash_period">#FFF5DAE3</color>
+    <color name="widget_wash_fertile">#FFDCFCE7</color>
+    <color name="widget_wash_follicular">#FFD6EAF8</color>
+    <color name="widget_wash_luteal">#FFEDE4F8</color>
+    <color name="phase_period">#FFC44B6A</color>
+    <color name="phase_fertile">#FF16A34A</color>
+    <color name="phase_follicular">#FF378ADD</color>
+    <color name="phase_luteal">#FF7F77DD</color>
+
+    <!-- Widget calendar day fills -->
+    <color name="cal_day_period">#FFF4A6B5</color>
+    <color name="cal_day_fertile">#FFB5E2F4</color>
+    <color name="cal_day_predicted">#FFF3C98A</color>
+    <color name="cal_day_fertile_text">#FF4A9BB8</color>
+    <color name="cal_day_today_ring">#FFF4A6B5</color>
+    <color name="stat_bar_fill">#FFB5E2F4</color>
 </resources>

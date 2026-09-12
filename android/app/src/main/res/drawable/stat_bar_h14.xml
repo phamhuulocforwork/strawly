@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/stat_bar_fill" />
+            <corners
+                android:topLeftRadius="2dp"
+                android:topRightRadius="2dp" />
+            <size
+                android:width="8dp"
+                android:height="14dp" />
+        </shape>
+    </item>
+</layer-list>

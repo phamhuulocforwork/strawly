@@ -290,6 +290,7 @@
   "daysLabel": "days",
   "logPeriodToday": "Log period today",
   "loggedPeriodToday": "Logged today",
+  "widgetPhaseTitle": "Phase",
   "phasePeriod": "Period",
   "phaseFollicular": "Follicular",
   "phaseFertile": "Fertile window",
