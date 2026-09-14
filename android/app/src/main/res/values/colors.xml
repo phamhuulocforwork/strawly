@@ -22,7 +22,7 @@
     <!-- Widget calendar day fills -->
     <color name="cal_day_period">#FFF4A6B5</color>
     <color name="cal_day_fertile">#FFB5E2F4</color>
-    <color name="cal_day_predicted">#FFF3C98A</color>
+    <color name="cal_day_predicted">#FFF8D5DC</color>
     <color name="cal_day_fertile_text">#FF4A9BB8</color>
     <color name="cal_day_today_ring">#FFF4A6B5</color>
     <color name="stat_bar_fill">#FFB5E2F4</color>

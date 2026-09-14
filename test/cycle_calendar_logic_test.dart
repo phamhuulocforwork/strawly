@@ -26,7 +26,7 @@ void main() {
     final kind = CycleCalendarLogic.kindFor(
       DateTime(2026, 9, 8),
       cycles: [ongoingCycle()],
-      predictedDate: DateTime(2026, 9, 23),
+      predictedDates: [DateTime(2026, 9, 23)],
     );
 
     expect(kind, CalendarDayKind.fertile);
@@ -36,7 +36,7 @@ void main() {
     final kind = CycleCalendarLogic.kindFor(
       DateTime(2026, 9, 23),
       cycles: [ongoingCycle()],
-      predictedDate: DateTime(2026, 9, 23),
+      predictedDates: [DateTime(2026, 9, 23)],
     );
 
     expect(kind, CalendarDayKind.predicted);
@@ -81,6 +81,38 @@ void main() {
       ),
       isNull,
     );
+  });
+
+  test('predicted range expands with window days', () {
+    final range = CycleCalendarLogic.predictedRange(
+      DateTime(2026, 9, 23),
+      windowDays: 2,
+    );
+
+    expect(range.start, DateTime(2026, 9, 21));
+    expect(range.end, DateTime(2026, 9, 29));
+  });
+
+  test('predicted range with no window is five core period days', () {
+    final range = CycleCalendarLogic.predictedRange(
+      DateTime(2026, 9, 23),
+    );
+
+    expect(range.start, DateTime(2026, 9, 23));
+    expect(range.end, DateTime(2026, 9, 27));
+  });
+
+  test('kindFor marks days from multiple predicted starts', () {
+    final kind = CycleCalendarLogic.kindFor(
+      DateTime(2026, 10, 20),
+      cycles: [ongoingCycle()],
+      predictedDates: [
+        DateTime(2026, 9, 23),
+        DateTime(2026, 10, 20),
+      ],
+    );
+
+    expect(kind, CalendarDayKind.predicted);
   });
 
   test('peak fertility is cycle day 14 from start', () {

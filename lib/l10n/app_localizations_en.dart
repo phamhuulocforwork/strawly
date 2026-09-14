@@ -57,6 +57,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentCycles => 'Recent cycles';
 
   @override
+  String get seeAll => 'See all';
+
+  @override
+  String get cycleHistory => 'Cycle history';
+
+  @override
   String get ongoing => 'Ongoing';
 
   @override
@@ -183,6 +189,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalCycleLengthOptional => 'Total cycle length (optional)';
 
   @override
+  String get cycleLengthLeaveUnset => 'Leave unset';
+
+  @override
   String get cycleLengthHint => 'e.g., 28';
 
   @override
@@ -212,21 +221,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cycleAddedSuccess => 'Cycle added successfully';
 
   @override
-  String errorMessage(String message) {
-    return 'Error: $message';
-  }
-
-  @override
   String get settings => 'Settings';
 
   @override
   String get appearance => 'Appearance';
 
   @override
-  String get darkMode => 'Dark mode';
+  String get themeMode => 'Theme';
 
   @override
-  String get darkModeSubtitle => 'Use dark theme for the app';
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
 
   @override
   String get language => 'Language';
@@ -313,7 +323,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get debugExit => 'Exit debug mode';
 
   @override
-  String get dataExported => 'Data exported to clipboard';
+  String get dataExported => 'Backup file ready to share';
 
   @override
   String exportFailed(String error) {
@@ -325,19 +335,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importDataConfirm =>
-      'This will replace all existing data. Make sure you have a backup first.\n\nPaste your backup JSON in the next step.';
+      'This will replace all existing data. Make sure you have a backup first.\n\nChoose your backup file in the next step.';
 
   @override
   String get cancel => 'Cancel';
 
   @override
   String get continueButton => 'Continue';
-
-  @override
-  String get pasteBackupTitle => 'Paste backup data';
-
-  @override
-  String get pasteBackupHint => 'Paste your JSON backup here';
 
   @override
   String get importButton => 'Import';
@@ -481,6 +485,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get somethingWentWrong => 'Something went wrong';
 
   @override
+  String get errorStorage =>
+      'Couldn\'t access your saved data. Please try again.';
+
+  @override
+  String get errorInvalidData =>
+      'That file doesn\'t look like a valid Strawly backup.';
+
+  @override
   String get predictedNextPeriod => 'Next expected period';
 
   @override
@@ -491,6 +503,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loggedPeriodToday => 'Logged today';
+
+  @override
+  String get endPeriodNow => 'End period';
+
+  @override
+  String get periodEndedSuccess => 'Period marked as ended';
 
   @override
   String get widgetPhaseTitle => 'Phase';
@@ -544,4 +562,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderPermissionDenied => 'Notification permission denied';
+
+  @override
+  String get cycleTracking => 'Cycle tracking';
+
+  @override
+  String get typicalCycleLength => 'Typical cycle length';
+
+  @override
+  String get typicalCycleLengthSubtitle =>
+      'Used for predictions when you have little history';
+
+  @override
+  String typicalCycleLengthDefault(int days) {
+    return 'Default ($days days)';
+  }
+
+  @override
+  String typicalCycleLengthDays(int days) {
+    return '$days days';
+  }
+
+  @override
+  String get typicalCycleLengthDialogTitle => 'Typical cycle length';
+
+  @override
+  String predictionWindowDays(int days) {
+    return '±$days days';
+  }
 }

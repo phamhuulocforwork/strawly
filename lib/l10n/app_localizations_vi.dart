@@ -57,6 +57,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get recentCycles => 'Chu kỳ gần đây';
 
   @override
+  String get seeAll => 'Xem tất cả';
+
+  @override
+  String get cycleHistory => 'Lịch sử chu kỳ';
+
+  @override
   String get ongoing => 'Chu kỳ hiện tại';
 
   @override
@@ -102,7 +108,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cycleCalendar => 'Lịch chu kỳ';
 
   @override
-  String get legendPeriod => 'Ngày 🍓';
+  String get legendPeriod => 'Hành kinh';
 
   @override
   String get legendFertile => 'Dễ có bé';
@@ -163,6 +169,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get totalCycleLengthOptional => 'Độ dài chu kỳ (không bắt buộc)';
 
   @override
+  String get cycleLengthLeaveUnset =>
+      'Không nhập — tự suy từ ngày kỳ tiếp theo';
+
+  @override
   String get cycleLengthHint => 'vd: 28';
 
   @override
@@ -193,21 +203,22 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cycleAddedSuccess => 'Đã lưu chu kỳ mới cho em rồi 👌';
 
   @override
-  String errorMessage(String message) {
-    return 'Có lỗi: $message';
-  }
-
-  @override
   String get settings => 'Cài đặt';
 
   @override
   String get appearance => 'Giao diện';
 
   @override
-  String get darkMode => 'Chế độ tối';
+  String get themeMode => 'Chủ đề';
 
   @override
-  String get darkModeSubtitle => 'Bật giao diện tối cho dễ nhìn hơn';
+  String get themeSystem => 'Theo máy';
+
+  @override
+  String get themeLight => 'Sáng';
+
+  @override
+  String get themeDark => 'Tối';
 
   @override
   String get language => 'Ngôn ngữ';
@@ -295,7 +306,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get debugExit => 'Thoát chế độ gỡ lỗi';
 
   @override
-  String get dataExported => 'Đã sao lưu vào clipboard rồi nhé';
+  String get dataExported => 'Đã tạo bản sao lưu, em chọn nơi lưu nhé';
 
   @override
   String exportFailed(String error) {
@@ -307,19 +318,13 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get importDataConfirm =>
-      'Việc này sẽ thay toàn bộ dữ liệu hiện tại của em. Em nhớ sao lưu trước nhé.\n\nỞ bước sau, em dán JSON sao lưu vào.';
+      'Việc này sẽ thay toàn bộ dữ liệu hiện tại của em. Em nhớ sao lưu trước nhé.\n\nỞ bước sau, em chọn tệp sao lưu nhé.';
 
   @override
   String get cancel => 'Huỷ';
 
   @override
   String get continueButton => 'Tiếp tục';
-
-  @override
-  String get pasteBackupTitle => 'Dán bản sao lưu';
-
-  @override
-  String get pasteBackupHint => 'Em dán JSON sao lưu vào đây nhé';
 
   @override
   String get importButton => 'Nhập';
@@ -463,6 +468,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get somethingWentWrong => 'Có gì đó không ổn';
 
   @override
+  String get errorStorage =>
+      'Không truy cập được dữ liệu đã lưu. Em thử lại nhé.';
+
+  @override
+  String get errorInvalidData =>
+      'Tệp này không phải bản sao lưu hợp lệ của Strawly.';
+
+  @override
   String get predictedNextPeriod => 'Dự kiến kỳ tiếp theo';
 
   @override
@@ -473,6 +486,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get loggedPeriodToday => 'Đã ghi nhận hôm nay';
+
+  @override
+  String get endPeriodNow => 'Kết thúc kỳ';
+
+  @override
+  String get periodEndedSuccess => 'Đã ghi nhận kỳ kết thúc cho em';
 
   @override
   String get widgetPhaseTitle => 'Hôm nay';
@@ -525,4 +544,32 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reminderPermissionDenied => 'Chưa cấp quyền thông báo';
+
+  @override
+  String get cycleTracking => 'Theo dõi chu kỳ';
+
+  @override
+  String get typicalCycleLength => 'Độ dài chu kỳ điển hình';
+
+  @override
+  String get typicalCycleLengthSubtitle =>
+      'Dùng để dự đoán khi bạn chưa có đủ lịch sử';
+
+  @override
+  String typicalCycleLengthDefault(int days) {
+    return 'Mặc định ($days ngày)';
+  }
+
+  @override
+  String typicalCycleLengthDays(int days) {
+    return '$days ngày';
+  }
+
+  @override
+  String get typicalCycleLengthDialogTitle => 'Độ dài chu kỳ điển hình';
+
+  @override
+  String predictionWindowDays(int days) {
+    return '±$days ngày';
+  }
 }

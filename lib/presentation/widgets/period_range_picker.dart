@@ -41,8 +41,8 @@ class PeriodRangeLogic {
     return !normalized.isBefore(first) && !normalized.isAfter(last);
   }
 
-  static ShadDateTimeRange defaultRange() {
-    final today = DateTimeUtils.dateOnly(DateTime.now());
+  static ShadDateTimeRange defaultRange([DateTime? anchor]) {
+    final today = DateTimeUtils.dateOnly(anchor ?? DateTime.now());
     return ShadDateTimeRange(
       start: today,
       end: DateTimeUtils.addDays(today, AppConstants.periodDuration - 1),
@@ -63,6 +63,17 @@ class PeriodRangeLogic {
   static int? inclusiveDuration(ShadDateTimeRange? range) {
     if (range?.start == null || range?.end == null) return null;
     return DateTimeUtils.daysBetween(range!.start!, range.end!) + 1;
+  }
+
+  /// Days from [start] through [day] inclusive, clamped to a valid duration.
+  static int durationThroughDay(DateTime start, DateTime day) {
+    final days =
+        DateTimeUtils.daysBetween(
+          DateTimeUtils.dateOnly(start),
+          DateTimeUtils.dateOnly(day),
+        ) +
+        1;
+    return days.clamp(minDuration, maxDuration);
   }
 
   static PeriodRangeValidationError? validateError(ShadDateTimeRange? range) {
@@ -137,7 +148,7 @@ class PeriodRangeLogic {
         ? DateTimeUtils.dateOnly(current!.end!)
         : null;
 
-    if (start == null || (start != null && end != null)) {
+    if (start == null || end != null) {
       return ShadDateTimeRange(start: date, end: null);
     }
 
@@ -378,7 +389,6 @@ class _InlineRangeCalendarState extends State<_InlineRangeCalendar> {
             final radius = RangeDayStyle.radiusForCell(
               role: role,
               columnIndex: columnIndex,
-              isToday: isToday,
             );
 
             return Material(
@@ -398,15 +408,16 @@ class _InlineRangeCalendarState extends State<_InlineRangeCalendar> {
                   decoration: BoxDecoration(
                     color: bg,
                     borderRadius: radius,
-                    border: isToday && bg == null
-                        ? Border.all(color: BentoTokens.primary, width: 2)
-                        : null,
                   ),
                   child: Text(
                     date.day.toString(),
                     style: TextStyle(
                       fontSize: BentoTokens.font14,
                       fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+                      decoration: isToday
+                          ? TextDecoration.underline
+                          : TextDecoration.none,
+                      decorationThickness: 1.5,
                       color: !selectable
                           ? BentoTokens.mutedText(context).withValues(
                               alpha: 0.4,

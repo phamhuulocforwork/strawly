@@ -9,6 +9,7 @@ import '../../domain/repositories/cycle_repository.dart';
 import '../../domain/usecases/cycle_usecases.dart';
 import '../../domain/usecases/prediction_usecases.dart';
 import '../../domain/usecases/statistics_usecases.dart';
+import '../../presentation/viewmodels/typical_cycle_length_viewmodel.dart';
 import 'hive_service.dart';
 
 final encryptionKeyProvider = FutureProvider<List<int>>((ref) async {
@@ -87,21 +88,36 @@ final calculateAverageUseCaseProvider =
       return CalculateAverageCycleLengthUseCase(repository);
     });
 
-final calculateWeightedAverageUseCaseProvider =
-    FutureProvider<CalculateWeightedAverageCycleLengthUseCase>((ref) async {
+final calculateTypicalCycleLengthUseCaseProvider =
+    FutureProvider<CalculateTypicalCycleLengthUseCase>((ref) async {
       final repository = await ref.watch(cycleRepositoryProvider.future);
-      return CalculateWeightedAverageCycleLengthUseCase(repository);
+      return CalculateTypicalCycleLengthUseCase(
+        repository,
+        fallbackCycleLength: () {
+          return ref.read(typicalCycleLengthProvider) ??
+              AppConstants.defaultCycleLength;
+        },
+      );
     });
 
 final predictNextCycleUseCaseProvider = FutureProvider<PredictNextCycleUseCase>(
   (ref) async {
     final repository = await ref.watch(cycleRepositoryProvider.future);
-    final calculateAverage = await ref.watch(
-      calculateWeightedAverageUseCaseProvider.future,
+    final calculateTypical = await ref.watch(
+      calculateTypicalCycleLengthUseCaseProvider.future,
     );
-    return PredictNextCycleUseCase(repository, calculateAverage);
+    return PredictNextCycleUseCase(repository, calculateTypical);
   },
 );
+
+final predictUpcomingCycleDatesUseCaseProvider =
+    FutureProvider<PredictUpcomingCycleDatesUseCase>((ref) async {
+      final repository = await ref.watch(cycleRepositoryProvider.future);
+      final calculateTypical = await ref.watch(
+        calculateTypicalCycleLengthUseCaseProvider.future,
+      );
+      return PredictUpcomingCycleDatesUseCase(repository, calculateTypical);
+    });
 
 final calculateStdDevUseCaseProvider =
     FutureProvider<CalculateStandardDeviationUseCase>((ref) async {

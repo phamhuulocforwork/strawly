@@ -2,6 +2,7 @@ import 'dart:math';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../repositories/cycle_repository.dart';
+import 'cycle_length_stats.dart';
 
 class CalculateAverageCycleLengthUseCase {
   final CycleRepository repository;
@@ -13,70 +14,81 @@ class CalculateAverageCycleLengthUseCase {
       limit: limit ?? AppConstants.cyclesToConsider,
     );
 
-    final completeCycles = cycles.where((c) => c.isComplete).toList();
+    final lengths = CycleLengthStats.plausibleLengthsFromComplete(
+      cycles.where((c) => c.isComplete).map((c) => c.cycleLength!),
+    );
 
-    if (completeCycles.isEmpty) {
+    if (lengths.isEmpty) {
       return AppConstants.defaultCycleLength.toDouble();
     }
 
-    final sum = completeCycles.fold<int>(
-      0,
-      (sum, cycle) => sum + cycle.cycleLength!,
-    );
-
-    return sum / completeCycles.length;
+    final sum = lengths.fold<int>(0, (sum, length) => sum + length);
+    return sum / lengths.length;
   }
 }
 
-class CalculateWeightedAverageCycleLengthUseCase {
+class CalculateTypicalCycleLengthUseCase {
   final CycleRepository repository;
+  final int Function() fallbackCycleLength;
 
-  CalculateWeightedAverageCycleLengthUseCase(this.repository);
+  CalculateTypicalCycleLengthUseCase(
+    this.repository, {
+    required this.fallbackCycleLength,
+  });
 
   Future<double> call({int? limit}) async {
     final cycles = await repository.getRecentCycles(
       limit: limit ?? AppConstants.cyclesToConsider,
     );
 
-    final completeCycles = cycles.where((c) => c.isComplete).toList();
+    final lengths = CycleLengthStats.plausibleLengthsFromComplete(
+      cycles.where((c) => c.isComplete).map((c) => c.cycleLength!),
+    );
 
-    if (completeCycles.isEmpty) {
-      return AppConstants.defaultCycleLength.toDouble();
+    if (lengths.isEmpty) {
+      return fallbackCycleLength().toDouble();
     }
 
-    double weightedSum = 0;
-    double totalWeight = 0;
-
-    for (int i = 0; i < completeCycles.length; i++) {
-      final weight = completeCycles.length - i; // Linear weight
-      weightedSum += completeCycles[i].cycleLength! * weight;
-      totalWeight += weight;
-    }
-
-    return weightedSum / totalWeight;
+    return CycleLengthStats.median(lengths);
   }
 }
 
 class PredictNextCycleUseCase {
   final CycleRepository repository;
-  final CalculateWeightedAverageCycleLengthUseCase calculateAverage;
+  final CalculateTypicalCycleLengthUseCase calculateTypical;
 
-  PredictNextCycleUseCase(this.repository, this.calculateAverage);
+  PredictNextCycleUseCase(this.repository, this.calculateTypical);
 
   Future<DateTime?> call() async {
+    final dates = await PredictUpcomingCycleDatesUseCase(
+      repository,
+      calculateTypical,
+    ).call(forecastCount: 1);
+    return dates.isEmpty ? null : dates.first;
+  }
+}
+
+class PredictUpcomingCycleDatesUseCase {
+  final CycleRepository repository;
+  final CalculateTypicalCycleLengthUseCase calculateTypical;
+
+  PredictUpcomingCycleDatesUseCase(this.repository, this.calculateTypical);
+
+  Future<List<DateTime>> call({int forecastCount = 3}) async {
     final latestCycle = await repository.getLatestCycle();
 
-    if (latestCycle == null) {
-      return null;
+    if (latestCycle == null || forecastCount <= 0) {
+      return const [];
     }
 
-    final averageLength = await calculateAverage();
-    final predictedStartDate = DateTimeUtils.addDays(
-      latestCycle.startDate,
-      averageLength.round(),
+    final typicalLength = (await calculateTypical()).round();
+    return List.generate(
+      forecastCount,
+      (index) => DateTimeUtils.addDays(
+        latestCycle.startDate,
+        typicalLength * (index + 1),
+      ),
     );
-
-    return predictedStartDate;
   }
 }
 
@@ -91,20 +103,22 @@ class CalculateStandardDeviationUseCase {
       limit: limit ?? AppConstants.cyclesToConsider,
     );
 
-    final completeCycles = cycles.where((c) => c.isComplete).toList();
+    final lengths = CycleLengthStats.plausibleLengthsFromComplete(
+      cycles.where((c) => c.isComplete).map((c) => c.cycleLength!),
+    );
 
-    if (completeCycles.length < 2) {
+    if (lengths.length < 2) {
       return 0.0;
     }
 
     final average = await calculateAverage(limit: limit);
 
     final variance =
-        completeCycles.fold<double>(0.0, (sum, cycle) {
-          final diff = cycle.cycleLength! - average;
+        lengths.fold<double>(0.0, (sum, length) {
+          final diff = length - average;
           return sum + (diff * diff);
         }) /
-        completeCycles.length;
+        lengths.length;
 
     return sqrt(variance);
   }
@@ -152,4 +166,15 @@ class CalculateRegularityScoreUseCase {
 
     return score.clamp(0.0, 100.0).toDouble();
   }
+}
+
+/// Window half-width in days for prediction UI (±N days).
+int predictionWindowDaysFromStatistics({
+  required int completeCycles,
+  required double standardDeviation,
+}) {
+  if (completeCycles < 2 || standardDeviation <= 0) {
+    return 0;
+  }
+  return standardDeviation.round().clamp(0, 5);
 }

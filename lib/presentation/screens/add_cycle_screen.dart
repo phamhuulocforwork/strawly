@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import '../../core/constants/app_constants.dart';
+import '../../core/utils/error_messages.dart';
 import '../../domain/entities/cycle.dart';
 import '../../l10n/app_localizations.dart';
 import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/bento_tile.dart';
+import '../widgets/cycle_length_wheel_picker_dialog.dart';
 import '../widgets/period_range_picker.dart';
 
 class AddCycleScreen extends ConsumerStatefulWidget {
   const AddCycleScreen({
     super.key,
     this.cycleToEdit,
+    this.initialDate,
     this.embeddedInSheet = false,
     this.scrollController,
     this.onSaved,
   });
 
   final Cycle? cycleToEdit;
+  final DateTime? initialDate;
   final bool embeddedInSheet;
   final ScrollController? scrollController;
   final VoidCallback? onSaved;
@@ -48,7 +52,7 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
       _notes = widget.cycleToEdit!.notes;
       _periodRange = PeriodRangeLogic.fromCycle(_startDate, _periodDuration);
     } else {
-      _periodRange = PeriodRangeLogic.defaultRange();
+      _periodRange = PeriodRangeLogic.defaultRange(widget.initialDate);
       _applyRange(_periodRange);
     }
   }
@@ -143,35 +147,36 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
               ),
             ),
             const SizedBox(height: BentoTokens.space8),
-            TextFormField(
-              initialValue: _cycleLength?.toString(),
-              keyboardType: TextInputType.number,
-              style: Theme.of(context).textTheme.bodyMedium,
-              decoration: _outlinedFieldDecoration(
-                hintText: l10n.cycleLengthHint,
-                suffixText: l10n.daysSuffix,
+            InkWell(
+              borderRadius: BorderRadius.circular(BentoTokens.radiusSm),
+              onTap: () async {
+                final outcome = await showRecordedCycleLengthPickerDialog(
+                  context,
+                  current: _cycleLength,
+                );
+                if (outcome == null || !mounted) return;
+                setState(() => _cycleLength = outcome.days);
+              },
+              child: InputDecorator(
+                decoration: _outlinedFieldDecoration(
+                  hintText: l10n.cycleLengthHint,
+                ).copyWith(
+                  suffixIcon: Icon(
+                    AppIcons.chevronRight,
+                    color: BentoTokens.mutedText(context),
+                  ),
+                ),
+                child: Text(
+                  _cycleLength == null
+                      ? l10n.cycleLengthLeaveUnset
+                      : l10n.typicalCycleLengthDays(_cycleLength!),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: _cycleLength == null
+                        ? BentoTokens.mutedText(context)
+                        : null,
+                  ),
+                ),
               ),
-              onChanged: (value) {
-                setState(() {
-                  _cycleLength = int.tryParse(value);
-                });
-              },
-              validator: (value) {
-                if (value != null && value.isNotEmpty) {
-                  final length = int.tryParse(value);
-                  if (length == null) {
-                    return l10n.enterValidNumber;
-                  }
-                  if (length < AppConstants.minCycleLength ||
-                      length > AppConstants.maxCycleLength) {
-                    return l10n.cycleLengthRange(
-                      AppConstants.minCycleLength,
-                      AppConstants.maxCycleLength,
-                    );
-                  }
-                }
-                return null;
-              },
             ),
           ],
           const SizedBox(height: BentoTokens.space16),
@@ -302,16 +307,11 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            widget.cycleToEdit != null
-                ? l10n.cycleUpdatedSuccess
-                : l10n.cycleAddedSuccess,
-          ),
-          backgroundColor: BentoTokens.success,
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppToast.success(
+        context,
+        title: widget.cycleToEdit != null
+            ? l10n.cycleUpdatedSuccess
+            : l10n.cycleAddedSuccess,
       );
 
       if (widget.onSaved != null) {
@@ -321,12 +321,9 @@ class _AddCycleScreenState extends ConsumerState<AddCycleScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.errorMessage(e.toString())),
-            backgroundColor: BentoTokens.danger,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppToast.error(
+          context,
+          title: ErrorMessages.friendly(e, l10n),
         );
       }
     } finally {

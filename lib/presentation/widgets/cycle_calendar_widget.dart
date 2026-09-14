@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/utils/date_time_utils.dart';
 import '../../domain/entities/cycle.dart';
 import '../../l10n/app_localizations.dart';
@@ -7,25 +10,31 @@ import '../theme/bento_tokens.dart';
 import 'bento_tile.dart';
 import 'cycle_calendar_logic.dart';
 import 'dashed_cell_border.dart';
+import 'period_range_picker.dart';
 import 'range_day_style.dart';
 
 class CycleCalendarWidget extends StatefulWidget {
   const CycleCalendarWidget({
     super.key,
     required this.cycles,
-    this.predictedDate,
+    this.predictedDates = const [],
     this.onCycleTap,
+    this.onDayTap,
   });
 
   final List<Cycle> cycles;
-  final DateTime? predictedDate;
+  final List<DateTime> predictedDates;
   final ValueChanged<Cycle>? onCycleTap;
+  final ValueChanged<DateTime>? onDayTap;
 
   @override
   State<CycleCalendarWidget> createState() => _CycleCalendarWidgetState();
 }
 
 class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
+  static const double _periodFillAlpha = 0.4;
+  static const double _predictedFillAlpha = 0.18;
+
   late DateTime selectedMonth;
 
   @override
@@ -140,12 +149,12 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
     final kind = CycleCalendarLogic.kindFor(
       date,
       cycles: widget.cycles,
-      predictedDate: widget.predictedDate,
+      predictedDates: widget.predictedDates,
     );
     final span = CycleCalendarLogic.spanFor(
       date,
       cycles: widget.cycles,
-      predictedDate: widget.predictedDate,
+      predictedDates: widget.predictedDates,
     );
 
     RangeDayRole role = RangeDayRole.none;
@@ -159,23 +168,23 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
         date,
         cycles: widget.cycles,
       );
-    } else if (span != null && kind != CalendarDayKind.none) {
+    } else if (span != null &&
+        (kind == CalendarDayKind.period || kind == CalendarDayKind.predicted)) {
       role = RangeDayStyle.roleForRange(
         date: date,
         rangeStart: span.start,
         rangeEnd: span.end,
       );
+      final fillAlpha = kind == CalendarDayKind.period
+          ? _periodFillAlpha
+          : _predictedFillAlpha;
       bgColor = RangeDayStyle.backgroundForRole(
         role,
-        accentColor: _accentForKind(kind),
-        middleAlpha: kind == CalendarDayKind.period ? 0.4 : 1,
+        accentColor: BentoTokens.primary,
+        middleAlpha: fillAlpha,
         uniformFill: true,
       );
       textColor = RangeDayStyle.textColorForRole(role, context);
-    }
-
-    if (isToday && bgColor == null && kind != CalendarDayKind.fertile) {
-      bgColor = BentoTokens.primary.withValues(alpha: 0.2);
     }
 
     final radius = kind == CalendarDayKind.fertile
@@ -183,8 +192,12 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
         : RangeDayStyle.radiusForCell(
             role: role,
             columnIndex: columnIndex,
-            isToday: isToday,
           );
+
+    final isPeriodStart =
+        kind == CalendarDayKind.period &&
+        span != null &&
+        DateTimeUtils.isSameDay(date, span.start);
 
     Widget cell = Container(
       height: 40,
@@ -192,23 +205,28 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: radius,
-        border: isToday && kind == CalendarDayKind.none
-            ? Border.all(color: BentoTokens.primary, width: 2)
-            : null,
       ),
-      child: Text(
-        date.day.toString(),
-        style: TextStyle(
-          color: textColor ?? BentoTokens.onSurfaceText(context),
-          fontWeight: isToday || isPeakFertile
-              ? FontWeight.bold
-              : FontWeight.w500,
-          fontSize: BentoTokens.font14,
-          decoration: isToday ? TextDecoration.underline : TextDecoration.none,
-          decorationColor: textColor ?? BentoTokens.onSurfaceText(context),
-          decorationThickness: 1.5,
-        ),
-      ),
+      child: isPeriodStart
+          ? _pinnedDay(
+              context,
+              date.day.toString(),
+              textColor,
+              isToday,
+              isToday || isPeakFertile,
+            )
+          : Text(
+              date.day.toString(),
+              style: TextStyle(
+                color: textColor ?? BentoTokens.onSurfaceText(context),
+                fontWeight: isToday || isPeakFertile
+                    ? FontWeight.bold
+                    : FontWeight.w500,
+                fontSize: BentoTokens.font14,
+                decoration: isToday ? TextDecoration.underline : TextDecoration.none,
+                decorationColor: textColor ?? BentoTokens.onSurfaceText(context),
+                decorationThickness: 1.5,
+              ),
+            ),
     );
 
     if (isPeakFertile) {
@@ -220,17 +238,80 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
     }
 
     final cycle = CycleCalendarLogic.cycleForDate(date, cycles: widget.cycles);
-    if (cycle == null || widget.onCycleTap == null) {
+    VoidCallback? onTap;
+    if (cycle != null && widget.onCycleTap != null) {
+      onTap = () => widget.onCycleTap!(cycle);
+    } else if (cycle == null &&
+        widget.onDayTap != null &&
+        PeriodRangeLogic.isDaySelectable(date)) {
+      onTap = () => widget.onDayTap!(date);
+    }
+
+    if (onTap == null) {
       return cell;
     }
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => widget.onCycleTap!(cycle),
+        onTap: onTap,
         borderRadius: radius,
         child: cell,
       ),
+    );
+  }
+
+  Widget _pinnedDay(
+    BuildContext context,
+    String dayText,
+    Color? textColor,
+    bool isToday,
+    bool emphasize,
+  ) {
+    return Stack(
+      fit: StackFit.expand,
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          top: -10,
+          left: -10,
+          child: Transform.rotate(
+            angle: -math.pi / 6,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/svgs/logo.svg',
+                  width: 28,
+                  height: 28,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                SvgPicture.asset(
+                  'assets/svgs/logo.svg',
+                  width: 24,
+                  height: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Center(
+          child: Text(
+            dayText,
+            style: TextStyle(
+              color: textColor ?? BentoTokens.onSurfaceText(context),
+              fontWeight: emphasize ? FontWeight.bold : FontWeight.w500,
+              fontSize: BentoTokens.font14,
+              decoration: isToday ? TextDecoration.underline : TextDecoration.none,
+              decorationColor: textColor ?? BentoTokens.onSurfaceText(context),
+              decorationThickness: 1.5,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -239,17 +320,11 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
     return isDark ? BentoTokens.secondaryDark : const Color(0xFF4A9BB8);
   }
 
-  Color _accentForKind(CalendarDayKind kind) {
-    switch (kind) {
-      case CalendarDayKind.period:
-        return BentoTokens.primary;
-      case CalendarDayKind.fertile:
-        return BentoTokens.secondary;
-      case CalendarDayKind.predicted:
-        return BentoTokens.predicted;
-      case CalendarDayKind.none:
-        return BentoTokens.primary;
-    }
+  Color _predictedLegendColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
+        ? BentoTokens.primaryDark.withValues(alpha: _predictedFillAlpha)
+        : BentoTokens.primary.withValues(alpha: _predictedFillAlpha);
   }
 
   Widget _buildLegend(BuildContext context, AppLocalizations l10n) {
@@ -271,7 +346,7 @@ class _CycleCalendarWidgetState extends State<CycleCalendarWidget> {
         ),
         _buildLegendItem(
           context,
-          color: BentoTokens.predicted,
+          color: _predictedLegendColor(context),
           label: l10n.legendPredicted,
         ),
       ],

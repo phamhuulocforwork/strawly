@@ -194,6 +194,18 @@ abstract class AppLocalizations {
   /// **'Recent cycles'**
   String get recentCycles;
 
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @cycleHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle history'**
+  String get cycleHistory;
+
   /// No description provided for @ongoing.
   ///
   /// In en, this message translates to:
@@ -374,6 +386,12 @@ abstract class AppLocalizations {
   /// **'Total cycle length (optional)'**
   String get totalCycleLengthOptional;
 
+  /// No description provided for @cycleLengthLeaveUnset.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave unset'**
+  String get cycleLengthLeaveUnset;
+
   /// No description provided for @cycleLengthHint.
   ///
   /// In en, this message translates to:
@@ -428,12 +446,6 @@ abstract class AppLocalizations {
   /// **'Cycle added successfully'**
   String get cycleAddedSuccess;
 
-  /// No description provided for @errorMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Error: {message}'**
-  String errorMessage(String message);
-
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:
@@ -446,17 +458,29 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get appearance;
 
-  /// No description provided for @darkMode.
+  /// No description provided for @themeMode.
   ///
   /// In en, this message translates to:
-  /// **'Dark mode'**
-  String get darkMode;
+  /// **'Theme'**
+  String get themeMode;
 
-  /// No description provided for @darkModeSubtitle.
+  /// No description provided for @themeSystem.
   ///
   /// In en, this message translates to:
-  /// **'Use dark theme for the app'**
-  String get darkModeSubtitle;
+  /// **'System'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
 
   /// No description provided for @language.
   ///
@@ -629,7 +653,7 @@ abstract class AppLocalizations {
   /// No description provided for @dataExported.
   ///
   /// In en, this message translates to:
-  /// **'Data exported to clipboard'**
+  /// **'Backup file ready to share'**
   String get dataExported;
 
   /// No description provided for @exportFailed.
@@ -647,7 +671,7 @@ abstract class AppLocalizations {
   /// No description provided for @importDataConfirm.
   ///
   /// In en, this message translates to:
-  /// **'This will replace all existing data. Make sure you have a backup first.\n\nPaste your backup JSON in the next step.'**
+  /// **'This will replace all existing data. Make sure you have a backup first.\n\nChoose your backup file in the next step.'**
   String get importDataConfirm;
 
   /// No description provided for @cancel.
@@ -661,18 +685,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get continueButton;
-
-  /// No description provided for @pasteBackupTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Paste backup data'**
-  String get pasteBackupTitle;
-
-  /// No description provided for @pasteBackupHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Paste your JSON backup here'**
-  String get pasteBackupHint;
 
   /// No description provided for @importButton.
   ///
@@ -920,6 +932,18 @@ abstract class AppLocalizations {
   /// **'Something went wrong'**
   String get somethingWentWrong;
 
+  /// No description provided for @errorStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t access your saved data. Please try again.'**
+  String get errorStorage;
+
+  /// No description provided for @errorInvalidData.
+  ///
+  /// In en, this message translates to:
+  /// **'That file doesn\'t look like a valid Strawly backup.'**
+  String get errorInvalidData;
+
   /// No description provided for @predictedNextPeriod.
   ///
   /// In en, this message translates to:
@@ -943,6 +967,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logged today'**
   String get loggedPeriodToday;
+
+  /// No description provided for @endPeriodNow.
+  ///
+  /// In en, this message translates to:
+  /// **'End period'**
+  String get endPeriodNow;
+
+  /// No description provided for @periodEndedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Period marked as ended'**
+  String get periodEndedSuccess;
 
   /// No description provided for @widgetPhaseTitle.
   ///
@@ -1027,6 +1063,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notification permission denied'**
   String get reminderPermissionDenied;
+
+  /// No description provided for @cycleTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle tracking'**
+  String get cycleTracking;
+
+  /// No description provided for @typicalCycleLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical cycle length'**
+  String get typicalCycleLength;
+
+  /// No description provided for @typicalCycleLengthSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for predictions when you have little history'**
+  String get typicalCycleLengthSubtitle;
+
+  /// No description provided for @typicalCycleLengthDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default ({days} days)'**
+  String typicalCycleLengthDefault(int days);
+
+  /// No description provided for @typicalCycleLengthDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String typicalCycleLengthDays(int days);
+
+  /// No description provided for @typicalCycleLengthDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical cycle length'**
+  String get typicalCycleLengthDialogTitle;
+
+  /// No description provided for @predictionWindowDays.
+  ///
+  /// In en, this message translates to:
+  /// **'±{days} days'**
+  String predictionWindowDays(int days);
 }
 
 class _AppLocalizationsDelegate

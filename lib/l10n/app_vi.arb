@@ -16,6 +16,8 @@
   "regularity": "Đều đặn",
   "loadingRegularity": "Đang xem độ đều đặn...",
   "recentCycles": "Chu kỳ gần đây",
+  "seeAll": "Xem tất cả",
+  "cycleHistory": "Lịch sử chu kỳ",
   "ongoing": "Chu kỳ hiện tại",
   "lengthDays": "Dài {count} ngày",
   "avgCycleDays": "{value} ngày",
@@ -28,7 +30,7 @@
   "expectedToday": "Hôm nay có thể tới",
   "daysOverdue": "Trễ {count} ngày rồi",
   "cycleCalendar": "Lịch chu kỳ",
-  "legendPeriod": "Ngày 🍓",
+  "legendPeriod": "Hành kinh",
   "legendFertile": "Dễ có bé",
   "legendPredicted": "Dự đoán",
   "periodDateRange": "Ngày kỳ kinh",
@@ -46,6 +48,7 @@
   "cycleEntryHelpText": "Em chọn kỳ kinh trên lịch bên dưới nhé. Khi em thêm chu kỳ mới, app sẽ tự tính độ dài chu kỳ.",
   "cycleLength": "Độ dài chu kỳ",
   "totalCycleLengthOptional": "Độ dài chu kỳ (không bắt buộc)",
+  "cycleLengthLeaveUnset": "Không nhập — tự suy từ ngày kỳ tiếp theo",
   "cycleLengthHint": "vd: 28",
   "daysSuffix": "ngày",
   "enterValidNumber": "Em nhập số hợp lệ nhé",
@@ -55,11 +58,12 @@
   "updateCycle": "Cập nhật",
   "cycleUpdatedSuccess": "Đã cập nhật chu kỳ cho em rồi nhé 👌",
   "cycleAddedSuccess": "Đã lưu chu kỳ mới cho em rồi 👌",
-  "errorMessage": "Có lỗi: {message}",
   "settings": "Cài đặt",
   "appearance": "Giao diện",
-  "darkMode": "Chế độ tối",
-  "darkModeSubtitle": "Bật giao diện tối cho dễ nhìn hơn",
+  "themeMode": "Chủ đề",
+  "themeSystem": "Theo máy",
+  "themeLight": "Sáng",
+  "themeDark": "Tối",
   "language": "Ngôn ngữ",
   "languageSubtitle": "Ngôn ngữ và cách hiển thị ngày",
   "languageSystem": "Theo máy",
@@ -88,14 +92,12 @@
   "debugCancelReminder": "Hủy lịch nhắc đã đặt",
   "debugReminderCancelled": "Đã hủy lịch nhắc",
   "debugExit": "Thoát chế độ gỡ lỗi",
-  "dataExported": "Đã sao lưu vào clipboard rồi nhé",
+  "dataExported": "Đã tạo bản sao lưu, em chọn nơi lưu nhé",
   "exportFailed": "Xuất không được: {error}",
   "importDataTitle": "Nhập dữ liệu",
-  "importDataConfirm": "Việc này sẽ thay toàn bộ dữ liệu hiện tại của em. Em nhớ sao lưu trước nhé.\n\nỞ bước sau, em dán JSON sao lưu vào.",
+  "importDataConfirm": "Việc này sẽ thay toàn bộ dữ liệu hiện tại của em. Em nhớ sao lưu trước nhé.\n\nỞ bước sau, em chọn tệp sao lưu nhé.",
   "cancel": "Huỷ",
   "continueButton": "Tiếp tục",
-  "pasteBackupTitle": "Dán bản sao lưu",
-  "pasteBackupHint": "Em dán JSON sao lưu vào đây nhé",
   "importButton": "Nhập",
   "importedCycles": "Đã nhập {count} chu kỳ cho em rồi",
   "importFailed": "Nhập không được: {error}",
@@ -162,10 +164,14 @@
   "nextExpected": "Dự kiến lần tới",
   "daysUnit": "{count} ngày",
   "somethingWentWrong": "Có gì đó không ổn",
+  "errorStorage": "Không truy cập được dữ liệu đã lưu. Em thử lại nhé.",
+  "errorInvalidData": "Tệp này không phải bản sao lưu hợp lệ của Strawly.",
   "predictedNextPeriod": "Dự kiến kỳ tiếp theo",
   "daysLabel": "ngày",
   "logPeriodToday": "Ghi nhận 🍓 hôm nay",
   "loggedPeriodToday": "Đã ghi nhận hôm nay",
+  "endPeriodNow": "Kết thúc kỳ",
+  "periodEndedSuccess": "Đã ghi nhận kỳ kết thúc cho em",
   "widgetPhaseTitle": "Hôm nay",
   "phasePeriod": "Kỳ kinh",
   "phaseFollicular": "Pha nang",
@@ -189,5 +195,27 @@
       "date": {"type": "String"}
     }
   },
-  "reminderPermissionDenied": "Chưa cấp quyền thông báo"
+  "reminderPermissionDenied": "Chưa cấp quyền thông báo",
+  "cycleTracking": "Theo dõi chu kỳ",
+  "typicalCycleLength": "Độ dài chu kỳ điển hình",
+  "typicalCycleLengthSubtitle": "Dùng để dự đoán khi bạn chưa có đủ lịch sử",
+  "typicalCycleLengthDefault": "Mặc định ({days} ngày)",
+  "@typicalCycleLengthDefault": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "typicalCycleLengthDays": "{days} ngày",
+  "@typicalCycleLengthDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "typicalCycleLengthDialogTitle": "Độ dài chu kỳ điển hình",
+  "predictionWindowDays": "±{days} ngày",
+  "@predictionWindowDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  }
 }

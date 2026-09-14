@@ -68,7 +68,13 @@ struct CycleWidgetProvider: TimelineProvider {
 
     let today = Calendar.current.startOfDay(for: Date())
     let remaining = entries.filter { $0.date >= today }
-    return remaining.isEmpty ? [entries.last ?? fallbackEntry()] : remaining
+    guard remaining.isEmpty else { return remaining }
+
+    // Timeline is stale (app not opened for > horizon). Only keep the last
+    // entry if it is close enough to today; otherwise show the empty state.
+    guard let last = entries.last else { return [fallbackEntry()] }
+    let daysOld = Calendar.current.dateComponents([.day], from: last.date, to: today).day ?? .max
+    return daysOld <= 3 ? [last] : [fallbackEntry()]
   }
 }
 

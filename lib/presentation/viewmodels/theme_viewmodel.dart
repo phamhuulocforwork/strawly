@@ -11,24 +11,38 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     _loadThemeMode();
   }
 
+  static const Map<String, ThemeMode> _names = {
+    'system': ThemeMode.system,
+    'light': ThemeMode.light,
+    'dark': ThemeMode.dark,
+  };
+
   void _loadThemeMode() {
     final box = settingsBox;
     if (box == null) return;
 
-    final isDark =
-        box.get(AppConstants.isDarkModeKey, defaultValue: false) as bool;
+    final saved = box.get(AppConstants.themeModeKey) as String?;
+    if (saved != null) {
+      state = _names[saved] ?? ThemeMode.system;
+      return;
+    }
 
-    state = isDark ? ThemeMode.dark : ThemeMode.light;
+    // Migrate the legacy dark-mode boolean if it was set before.
+    if (box.containsKey(AppConstants.isDarkModeKey)) {
+      final isDark = box.get(AppConstants.isDarkModeKey) as bool;
+      setThemeMode(isDark ? ThemeMode.dark : ThemeMode.light);
+      return;
+    }
+
+    state = ThemeMode.light;
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
     state = mode;
-    await settingsBox?.put(AppConstants.isDarkModeKey, mode == ThemeMode.dark);
-  }
-
-  Future<void> toggleTheme() async {
-    final newMode = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
-    await setThemeMode(newMode);
+    await settingsBox?.put(
+      AppConstants.themeModeKey,
+      _names.entries.firstWhere((entry) => entry.value == mode).key,
+    );
   }
 }
 

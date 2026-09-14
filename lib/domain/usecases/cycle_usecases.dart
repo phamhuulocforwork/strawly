@@ -31,7 +31,9 @@ class AddCycleUseCase {
         cycle.startDate,
       );
 
-      if (daysBetween > 0) {
+      if (daysBetween > 0 &&
+          daysBetween >= AppConstants.minPlausibleCycleLength &&
+          daysBetween <= AppConstants.maxPlausibleCycleLength) {
         final updatedCycle = latestCycle.copyWith(
           cycleLength: daysBetween,
           updatedAt: DateTime.now(),

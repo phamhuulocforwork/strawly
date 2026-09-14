@@ -91,6 +91,11 @@ void main() {
         predictedNextCycleDateProvider.overrideWith(
           (ref) => Future.value(predictedDate),
         ),
+        predictedCycleDatesProvider.overrideWith(
+          (ref) => Future.value(
+            predictedDate != null ? [predictedDate] : const [],
+          ),
+        ),
       ],
       child: MaterialApp(
         locale: LocaleSupport.materialLocaleFor(localePreference),
@@ -157,7 +162,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Settings'), findsAtLeastNWidgets(1));
-    expect(find.text('Dark mode'), findsOneWidget);
+    expect(find.text('Theme'), findsOneWidget);
   });
 
   testWidgets('AppShell shows Vietnamese copy when locale is vi', (
@@ -176,7 +181,7 @@ void main() {
     await tester.tap(find.text('Cài đặt'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Chế độ tối'), findsOneWidget);
+    expect(find.text('Chủ đề'), findsOneWidget);
     expect(find.text('Ngôn ngữ'), findsAtLeastNWidgets(1));
   });
 

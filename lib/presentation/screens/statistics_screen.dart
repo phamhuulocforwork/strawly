@@ -27,6 +27,7 @@ class StatisticsScreen extends ConsumerWidget {
 
     return SafeArea(
       child: statisticsAsync.when(
+        skipLoadingOnReload: true,
         loading: () => SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(BentoTokens.space16),
@@ -45,7 +46,7 @@ class StatisticsScreen extends ConsumerWidget {
             child: BentoTile(
               label: l10n.statisticsError,
               isError: true,
-              errorMessage: error.toString(),
+              errorMessage: l10n.somethingWentWrong,
               child: const SizedBox.shrink(),
             ),
           ),
@@ -259,6 +260,24 @@ class StatisticsScreen extends ConsumerWidget {
                 ),
               ),
               borderData: FlBorderData(show: false),
+              lineTouchData: LineTouchData(
+                handleBuiltInTouches: true,
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipColor: (_) => const Color(0xFF2D2D2D),
+                  getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
+                    final cycle = completeCycles[spot.spotIndex];
+                    return LineTooltipItem(
+                      '${l10n.daysUnit('${cycle.cycleLength}')}\n'
+                      '${DateTimeUtils.formatDateShort(cycle.startDate, locale)}',
+                      const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
               minY: minLength - yPadding,
               maxY: maxLength + yPadding,
               lineBarsData: [
@@ -443,6 +462,26 @@ class StatisticsScreen extends ConsumerWidget {
             },
           ),
           borderData: FlBorderData(show: false),
+          barTouchData: BarTouchData(
+            handleBuiltInTouches: true,
+            touchTooltipData: BarTouchTooltipData(
+              getTooltipColor: (_) => const Color(0xFF2D2D2D),
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                final cycle = completeCycles[groupIndex];
+                final delta = cycle.cycleLength! - average;
+                final sign = delta >= 0 ? '+' : '';
+                return BarTooltipItem(
+                  '$sign${delta.round()} ${l10n.daysLabel}\n'
+                  '${DateTimeUtils.formatDateShort(cycle.startDate, locale)}',
+                  const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                );
+              },
+            ),
+          ),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
               sideTitles: SideTitles(

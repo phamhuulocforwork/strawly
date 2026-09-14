@@ -12,7 +12,7 @@ class BentoTokens {
   static const Color accent = Color(0xFFE8D4F2);
   static const Color success = Color(0xFF16A34A);
   static const Color warning = Color(0xFFD97706);
-  static const Color predicted = Color(0xFFF3C98A);
+  static const Color predicted = Color(0xFFB56B7C);
   static const Color danger = Color(0xFFFF5A5A);
   static const Color surface = Color(0xFFFFFBF7);
   static const Color text = Color(0xFF2D2D2D);

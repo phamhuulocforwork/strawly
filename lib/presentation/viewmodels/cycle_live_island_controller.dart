@@ -6,7 +6,7 @@ import 'package:live_activities/live_activities.dart';
 import '../../core/constants/app_constants.dart';
 import '../../domain/entities/cycle_live_island_snapshot.dart';
 import '../../l10n/app_localizations.dart';
-import '../../presentation/widgets/cycle_calendar_logic.dart';
+import '../widgets/cycle_calendar_logic.dart';
 import 'cycle_viewmodel.dart';
 import 'cycle_widget_sync.dart';
 import 'live_island_settings_viewmodel.dart';
@@ -24,6 +24,7 @@ class CycleLiveIslandController {
   final LiveActivities _liveActivities = LiveActivities();
   bool _initialized = false;
   bool _syncInFlight = false;
+  bool _syncDirty = false;
 
   bool get _isSupportedPlatform {
     if (kIsWeb) return false;
@@ -44,7 +45,10 @@ class CycleLiveIslandController {
   Future<void> syncFromAppState() async {
     if (!_isSupportedPlatform) return;
 
-    if (_syncInFlight) return;
+    if (_syncInFlight) {
+      _syncDirty = true;
+      return;
+    }
     _syncInFlight = true;
 
     try {
@@ -52,11 +56,15 @@ class CycleLiveIslandController {
       final predictedDate = await _ref.read(
         predictedNextCycleDateProvider.future,
       );
+      final predictedDates = await _ref.read(
+        predictedCycleDatesProvider.future,
+      );
       final locale = _ref.read(effectiveLocaleProvider);
 
       await CycleWidgetSync.sync(
         cycles: cycleState.cycles,
         predictedDate: predictedDate,
+        predictedDates: predictedDates,
         locale: locale,
       );
 
@@ -90,6 +98,10 @@ class CycleLiveIslandController {
       debugPrint('Live island sync failed: $error\n$stack');
     } finally {
       _syncInFlight = false;
+      if (_syncDirty) {
+        _syncDirty = false;
+        await syncFromAppState();
+      }
     }
   }
 

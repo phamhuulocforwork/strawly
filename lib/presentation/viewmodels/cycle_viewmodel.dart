@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/di/providers.dart';
 import '../../domain/entities/cycle.dart';
 import '../../domain/entities/cycle_statistics.dart';
+import 'typical_cycle_length_viewmodel.dart';
 
 class CycleListState {
   final List<Cycle> cycles;
@@ -34,6 +36,11 @@ class CycleListNotifier extends StateNotifier<CycleListState> {
     loadCycles();
   }
 
+  String _logError(Object error) {
+    debugPrint('Strawly error: $error');
+    return error.toString();
+  }
+
   Future<void> loadCycles() async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -42,8 +49,9 @@ class CycleListNotifier extends StateNotifier<CycleListState> {
       final cycles = await useCase();
 
       state = state.copyWith(cycles: cycles, isLoading: false);
+      ref.read(cycleDataRevisionProvider.notifier).state++;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(isLoading: false, error: _logError(e));
     }
   }
 
@@ -53,7 +61,7 @@ class CycleListNotifier extends StateNotifier<CycleListState> {
       await useCase(cycle);
       await loadCycles(); // Reload cycles
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: _logError(e));
       rethrow;
     }
   }
@@ -64,7 +72,7 @@ class CycleListNotifier extends StateNotifier<CycleListState> {
       await useCase(cycle);
       await loadCycles(); // Reload cycles
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: _logError(e));
       rethrow;
     }
   }
@@ -75,7 +83,7 @@ class CycleListNotifier extends StateNotifier<CycleListState> {
       await useCase(id);
       await loadCycles(); // Reload cycles
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: _logError(e));
       rethrow;
     }
   }
@@ -85,7 +93,7 @@ class CycleListNotifier extends StateNotifier<CycleListState> {
       final useCase = await ref.read(getCyclesInRangeUseCaseProvider.future);
       return await useCase(start, end);
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: _logError(e));
       return [];
     }
   }
@@ -96,18 +104,28 @@ final cycleListProvider =
       return CycleListNotifier(ref);
     });
 
+/// Bumped after each successful [CycleListNotifier.loadCycles].
+/// Derived providers watch this instead of [cycleListProvider] to avoid
+/// Riverpod circular dependencies when refreshing from the list notifier.
+final cycleDataRevisionProvider = StateProvider<int>((ref) => 0);
+
 final cycleStatisticsProvider = FutureProvider<CycleStatistics>((ref) async {
-  // Watch cycle list to refresh when cycles change
-  ref.watch(cycleListProvider);
+  ref.watch(cycleDataRevisionProvider);
+  ref.watch(typicalCycleLengthProvider);
 
   final useCase = await ref.watch(getStatisticsUseCaseProvider.future);
   return await useCase();
 });
 
-final predictedNextCycleDateProvider = FutureProvider<DateTime?>((ref) async {
-  // Watch cycle list to refresh when cycles change
-  ref.watch(cycleListProvider);
+final predictedCycleDatesProvider = FutureProvider<List<DateTime>>((ref) async {
+  ref.watch(cycleDataRevisionProvider);
+  ref.watch(typicalCycleLengthProvider);
 
-  final useCase = await ref.watch(predictNextCycleUseCaseProvider.future);
-  return await useCase();
+  final useCase = await ref.watch(predictUpcomingCycleDatesUseCaseProvider.future);
+  return useCase();
+});
+
+final predictedNextCycleDateProvider = FutureProvider<DateTime?>((ref) async {
+  final dates = await ref.watch(predictedCycleDatesProvider.future);
+  return dates.isEmpty ? null : dates.first;
 });

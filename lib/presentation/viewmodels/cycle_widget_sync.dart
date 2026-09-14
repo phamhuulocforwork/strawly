@@ -51,7 +51,7 @@ class CycleWidgetTimeline {
   }) {
     final start = DateTimeUtils.dateOnly(now ?? DateTime.now());
     return List.generate(days, (offset) {
-      final date = DateTimeUtils.addDays(start, offset);
+      final date = DateTime(start.year, start.month, start.day + offset);
       final snapshot = CycleLiveIslandSnapshot.from(
         cycles: cycles,
         predictedDate: predictedDate,
@@ -133,6 +133,7 @@ class CycleWidgetCalendar {
 
   static Map<String, dynamic> build({
     required List<Cycle> cycles,
+    List<DateTime> predictedDates = const [],
     DateTime? predictedDate,
     required AppLocalizations l10n,
     String? locale,
@@ -141,9 +142,11 @@ class CycleWidgetCalendar {
     final reference = now ?? DateTime.now();
     final currentMonth = DateTime(reference.year, reference.month);
     final nextMonth = DateTime(reference.year, reference.month + 1);
+    final nextPredicted = predictedDate ??
+        (predictedDates.isNotEmpty ? predictedDates.first : null);
     final snapshot = CycleLiveIslandSnapshot.from(
       cycles: cycles,
-      predictedDate: predictedDate,
+      predictedDate: nextPredicted,
       now: reference,
     );
     final daysUntil = snapshot.daysUntil;
@@ -165,12 +168,12 @@ class CycleWidgetCalendar {
         _buildMonth(
           month: currentMonth,
           cycles: cycles,
-          predictedDate: predictedDate,
+          predictedDates: predictedDates,
         ),
         _buildMonth(
           month: nextMonth,
           cycles: cycles,
-          predictedDate: predictedDate,
+          predictedDates: predictedDates,
         ),
       ],
     };
@@ -179,7 +182,7 @@ class CycleWidgetCalendar {
   static Map<String, dynamic> _buildMonth({
     required DateTime month,
     required List<Cycle> cycles,
-    DateTime? predictedDate,
+    List<DateTime> predictedDates = const [],
   }) {
     final firstDay = DateTimeUtils.firstDayOfMonth(month);
     final lastDay = DateTimeUtils.lastDayOfMonth(month);
@@ -191,7 +194,7 @@ class CycleWidgetCalendar {
       final kind = CycleCalendarLogic.kindFor(
         date,
         cycles: cycles,
-        predictedDate: predictedDate,
+        predictedDates: predictedDates,
       );
       final peak = kind == CalendarDayKind.fertile &&
           CycleCalendarLogic.isPeakFertilityDay(date, cycles: cycles);
@@ -235,6 +238,7 @@ class CycleWidgetSync {
   static Future<void> sync({
     required List<Cycle> cycles,
     DateTime? predictedDate,
+    List<DateTime> predictedDates = const [],
     required Locale locale,
   }) async {
     if (!_isSupportedPlatform) return;
@@ -253,6 +257,11 @@ class CycleWidgetSync {
         CycleWidgetCalendar.build(
           cycles: cycles,
           predictedDate: predictedDate,
+          predictedDates: predictedDates.isNotEmpty
+              ? predictedDates
+              : predictedDate != null
+                  ? [predictedDate]
+                  : const [],
           l10n: l10n,
           locale: locale.toString(),
         ),

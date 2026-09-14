@@ -59,6 +59,7 @@ abstract class CycleWidgetProvider : HomeWidgetProvider() {
             ?: timeline.indexOfLast { it.getLong("d") <= today }.takeIf { it >= 0 }
             ?: 0
         val todayEntry = timeline.getOrNull(todayIndex)
+            ?.takeIf { today - it.getLong("d") <= STALE_AFTER_MILLIS }
 
         for (appWidgetId in appWidgetIds) {
             val (layout, barCount) = resolveLayout(context, appWidgetManager, appWidgetId)
@@ -260,8 +261,8 @@ abstract class CycleWidgetProvider : HomeWidgetProvider() {
                     month.getInt("m") == todayMonth &&
                     dayNumber == todayDay
                 views.setTextViewText(cellId, dayNumber.toString())
-                val background = if (isToday && kind == "none") {
-                    R.drawable.cal_day_today
+                val background = if (isToday) {
+                    todayDrawable(kind)
                 } else {
                     calDayDrawable(kind)
                 }
@@ -294,7 +295,7 @@ abstract class CycleWidgetProvider : HomeWidgetProvider() {
         views.setTextViewText(R.id.widget_phase_title, header.optString("t", ""))
         views.setTextViewText(R.id.widget_digit, header.optString("n", "—"))
         views.setViewVisibility(R.id.widget_digit, View.VISIBLE)
-        views.setInt(R.id.widget_digit, "setBackgroundResource", R.drawable.badge_period)
+        views.setInt(R.id.widget_digit, "setBackgroundResource", badgeRes(phaseKey))
         views.setTextColor(
             R.id.widget_digit,
             themedColor(context, R.color.widget_badge_text),
@@ -366,19 +367,18 @@ abstract class CycleWidgetProvider : HomeWidgetProvider() {
         return months.getJSONObject(0)
     }
 
-    private fun formatMonthTitle(year: Int, month: Int): String {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.YEAR, year)
-        calendar.set(Calendar.MONTH, month - 1)
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        return SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(calendar.time)
-    }
-
     private fun calDayDrawable(kind: String): Int = when (kind) {
         "period" -> R.drawable.cal_day_period
         "fertile" -> R.drawable.cal_day_fertile
         "predicted" -> R.drawable.cal_day_predicted
         else -> R.drawable.cal_day_none
+    }
+
+    private fun todayDrawable(kind: String): Int = when (kind) {
+        "period" -> R.drawable.cal_day_today_period
+        "fertile" -> R.drawable.cal_day_today_fertile
+        "predicted" -> R.drawable.cal_day_today_predicted
+        else -> R.drawable.cal_day_today
     }
 
     private fun todayStartMillis(): Long {
@@ -388,21 +388,6 @@ abstract class CycleWidgetProvider : HomeWidgetProvider() {
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
         return calendar.timeInMillis
-    }
-
-    private fun weekdayInitial(millis: Long): String {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = millis
-        return when (calendar.get(Calendar.DAY_OF_WEEK)) {
-            Calendar.SUNDAY -> "S"
-            Calendar.MONDAY -> "M"
-            Calendar.TUESDAY -> "T"
-            Calendar.WEDNESDAY -> "W"
-            Calendar.THURSDAY -> "T"
-            Calendar.FRIDAY -> "F"
-            Calendar.SATURDAY -> "S"
-            else -> ""
-        }
     }
 
     private fun formatTodayDate(millis: Long?): String {
@@ -483,6 +468,10 @@ abstract class CycleWidgetProvider : HomeWidgetProvider() {
         const val TIMELINE_KEY = "widget_timeline"
         const val CALENDAR_KEY = "widget_calendar"
         const val STATS_KEY = "widget_stats"
+
+        // ponytail: hide phase once the timeline is older than this many days
+        // (app not opened for > horizonDays). Bump if widgets must always show.
+        private const val STALE_AFTER_MILLIS = 3L * 24 * 60 * 60 * 1000
 
         private val STAT_BAR_IDS = intArrayOf(
             R.id.stat_bar_0, R.id.stat_bar_1, R.id.stat_bar_2, R.id.stat_bar_3,

@@ -113,5 +113,62 @@ void main() {
       expect(PeriodRangeLogic.inclusiveDuration(full), 10);
       expect(full?.end, DateTime(2026, 3, 10));
     });
+
+    test('durationThroughDay counts same-day as 1', () {
+      expect(
+        PeriodRangeLogic.durationThroughDay(
+          DateTime(2026, 3, 1),
+          DateTime(2026, 3, 1),
+        ),
+        1,
+      );
+    });
+
+    test('durationThroughDay counts 5 inclusive days', () {
+      expect(
+        PeriodRangeLogic.durationThroughDay(
+          DateTime(2026, 3, 1),
+          DateTime(2026, 3, 5),
+        ),
+        5,
+      );
+    });
+
+    test('durationThroughDay ignores time-of-day', () {
+      expect(
+        PeriodRangeLogic.durationThroughDay(
+          DateTime(2026, 3, 1, 23, 59),
+          DateTime(2026, 3, 3, 0, 1),
+        ),
+        3,
+      );
+    });
+
+    test('durationThroughDay clamps to max duration', () {
+      expect(
+        PeriodRangeLogic.durationThroughDay(
+          DateTime(2026, 3, 1),
+          DateTime(2026, 3, 20),
+        ),
+        PeriodRangeLogic.maxDuration,
+      );
+    });
+
+    test('durationThroughDay clamps day before start to 1', () {
+      expect(
+        PeriodRangeLogic.durationThroughDay(
+          DateTime(2026, 3, 5),
+          DateTime(2026, 3, 1),
+        ),
+        1,
+      );
+    });
+
+    test('defaultRange anchors on the provided date', () {
+      final range = PeriodRangeLogic.defaultRange(DateTime(2026, 4, 10));
+
+      expect(range.start, DateTime(2026, 4, 10));
+      expect(PeriodRangeLogic.inclusiveDuration(range), 5);
+    });
   });
 }

@@ -94,6 +94,22 @@ void main() {
       expect(entries.map((e) => e.digit).toList(), ['3', '4', '5']);
     });
 
+    test('entries stay at local midnight across a DST transition', () {
+      final entries = CycleWidgetTimeline.build(
+        cycles: const [],
+        predictedDate: null,
+        l10n: en,
+        now: DateTime(2026, 3, 7),
+        days: 4,
+      );
+
+      for (var offset = 0; offset < 4; offset++) {
+        final expected = DateTime(2026, 3, 7 + offset);
+        expect(entries[offset].date, expected);
+        expect(entries[offset].toJson()['d'], expected.millisecondsSinceEpoch);
+      }
+    });
+
     test('stats payload includes recent cycle lengths and avg label', () {
       final cycles = [
         cycle(id: '1', startDate: DateTime(2026, 6, 5), cycleLength: 28),
@@ -123,7 +139,7 @@ void main() {
       final cycles = [cycle(id: '1', startDate: DateTime(2026, 9, 5))];
       final calendar = CycleWidgetCalendar.build(
         cycles: cycles,
-        predictedDate: DateTime(2026, 10, 3),
+        predictedDates: [DateTime(2026, 10, 3)],
         l10n: en,
         now: DateTime(2026, 9, 7),
       );

@@ -19,6 +19,8 @@
   "regularity": "Regularity",
   "loadingRegularity": "Loading regularity",
   "recentCycles": "Recent cycles",
+  "seeAll": "See all",
+  "cycleHistory": "Cycle history",
   "ongoing": "Ongoing",
   "lengthDays": "Length: {count} days",
   "@lengthDays": {
@@ -104,6 +106,7 @@
   "cycleEntryHelpText": "Select your period on the calendar below. Cycle length is calculated when you add the next cycle.",
   "cycleLength": "Cycle length",
   "totalCycleLengthOptional": "Total cycle length (optional)",
+  "cycleLengthLeaveUnset": "Leave unset",
   "cycleLengthHint": "e.g., 28",
   "daysSuffix": "days",
   "enterValidNumber": "Enter a valid number",
@@ -123,18 +126,12 @@
   "updateCycle": "Update cycle",
   "cycleUpdatedSuccess": "Cycle updated successfully",
   "cycleAddedSuccess": "Cycle added successfully",
-  "errorMessage": "Error: {message}",
-  "@errorMessage": {
-    "placeholders": {
-      "message": {
-        "type": "String"
-      }
-    }
-  },
   "settings": "Settings",
   "appearance": "Appearance",
-  "darkMode": "Dark mode",
-  "darkModeSubtitle": "Use dark theme for the app",
+  "themeMode": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
   "language": "Language",
   "languageSubtitle": "Choose app language and date format",
   "languageSystem": "System default",
@@ -163,7 +160,7 @@
   "debugCancelReminder": "Cancel scheduled reminder",
   "debugReminderCancelled": "Scheduled reminder cancelled",
   "debugExit": "Exit debug mode",
-  "dataExported": "Data exported to clipboard",
+  "dataExported": "Backup file ready to share",
   "exportFailed": "Export failed: {error}",
   "@exportFailed": {
     "placeholders": {
@@ -173,11 +170,9 @@
     }
   },
   "importDataTitle": "Import data",
-  "importDataConfirm": "This will replace all existing data. Make sure you have a backup first.\n\nPaste your backup JSON in the next step.",
+  "importDataConfirm": "This will replace all existing data. Make sure you have a backup first.\n\nChoose your backup file in the next step.",
   "cancel": "Cancel",
   "continueButton": "Continue",
-  "pasteBackupTitle": "Paste backup data",
-  "pasteBackupHint": "Paste your JSON backup here",
   "importButton": "Import",
   "importedCycles": "Successfully imported {count} cycles",
   "@importedCycles": {
@@ -286,10 +281,14 @@
     }
   },
   "somethingWentWrong": "Something went wrong",
+  "errorStorage": "Couldn't access your saved data. Please try again.",
+  "errorInvalidData": "That file doesn't look like a valid Strawly backup.",
   "predictedNextPeriod": "Next expected period",
   "daysLabel": "days",
   "logPeriodToday": "Log period today",
   "loggedPeriodToday": "Logged today",
+  "endPeriodNow": "End period",
+  "periodEndedSuccess": "Period marked as ended",
   "widgetPhaseTitle": "Phase",
   "phasePeriod": "Period",
   "phaseFollicular": "Follicular",
@@ -313,5 +312,27 @@
       "date": {"type": "String"}
     }
   },
-  "reminderPermissionDenied": "Notification permission denied"
+  "reminderPermissionDenied": "Notification permission denied",
+  "cycleTracking": "Cycle tracking",
+  "typicalCycleLength": "Typical cycle length",
+  "typicalCycleLengthSubtitle": "Used for predictions when you have little history",
+  "typicalCycleLengthDefault": "Default ({days} days)",
+  "@typicalCycleLengthDefault": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "typicalCycleLengthDays": "{days} days",
+  "@typicalCycleLengthDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "typicalCycleLengthDialogTitle": "Typical cycle length",
+  "predictionWindowDays": "±{days} days",
+  "@predictionWindowDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  }
 }

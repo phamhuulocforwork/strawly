@@ -10,6 +10,7 @@ class AppConstants {
 
   // Settings Keys
   static const String isDarkModeKey = 'is_dark_mode';
+  static const String themeModeKey = 'theme_mode';
   static const String localePreferenceKey = 'locale_preference';
   static const String isPinEnabledKey = 'is_pin_enabled';
   static const String userPinKey = 'user_pin';
@@ -17,6 +18,7 @@ class AppConstants {
   static const String liveIslandEnabledKey = 'live_island_enabled';
   static const String reminderEnabledKey = 'reminder_enabled';
   static const String reminderLeadDaysKey = 'reminder_lead_days';
+  static const String typicalCycleLengthKey = 'typical_cycle_length';
 
   // OS Live Activity / Super Island (decorative, process-bound)
   static const String liveIslandActivityId = 'strawly-cycle';
@@ -27,6 +29,8 @@ class AppConstants {
   static const int defaultCycleLength = 28;
   static const int minCycleLength = 21;
   static const int maxCycleLength = 35;
+  static const int minPlausibleCycleLength = 15;
+  static const int maxPlausibleCycleLength = 60;
   static const int periodDuration = 5; // Average period duration in days
   static const int cyclesToConsider =
       6; // Number of recent cycles for prediction

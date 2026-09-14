@@ -16,7 +16,7 @@
 
     <color name="cal_day_period">#FF5C3A44</color>
     <color name="cal_day_fertile">#FF2A4555</color>
-    <color name="cal_day_predicted">#FF5C4A2A</color>
+    <color name="cal_day_predicted">#33D97B8F</color>
     <color name="cal_day_fertile_text">#FF7BB8D9</color>
     <color name="cal_day_today_ring">#FFD97B8F</color>
     <color name="stat_bar_fill">#FF7BB8D9</color>

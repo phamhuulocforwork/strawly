@@ -6,6 +6,29 @@ import '../../presentation/theme/bento_tokens.dart';
 class AppTheme {
   AppTheme._();
 
+  static const EdgeInsetsGeometry _toastPadding = EdgeInsets.fromLTRB(
+    BentoTokens.space16,
+    BentoTokens.space16,
+    BentoTokens.space24,
+    BentoTokens.space16,
+  );
+
+  static ShadToastTheme _primaryToastTheme() {
+    return const ShadToastTheme(
+      alignment: Alignment.topCenter,
+      showCloseIconOnlyWhenHovered: false,
+      padding: _toastPadding,
+    );
+  }
+
+  static ShadToastTheme _destructiveToastTheme() {
+    return const ShadToastTheme(
+      alignment: Alignment.topCenter,
+      showCloseIconOnlyWhenHovered: false,
+      padding: _toastPadding,
+    );
+  }
+
   static TextTheme _textTheme(Brightness brightness) {
     final base = GoogleFonts.interTextTheme(
       brightness == Brightness.dark
@@ -59,6 +82,8 @@ class AppTheme {
         hoverBackgroundColor: BentoTokens.primaryButtonHover,
         foregroundColor: Colors.white,
       ),
+      primaryToastTheme: _primaryToastTheme(),
+      destructiveToastTheme: _destructiveToastTheme(),
     );
   }
 
@@ -79,6 +104,8 @@ class AppTheme {
         hoverBackgroundColor: BentoTokens.primaryButtonHover,
         foregroundColor: Colors.white,
       ),
+      primaryToastTheme: _primaryToastTheme(),
+      destructiveToastTheme: _destructiveToastTheme(),
     );
   }
 

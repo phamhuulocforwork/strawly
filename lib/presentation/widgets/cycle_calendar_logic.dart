@@ -63,18 +63,26 @@ class CycleCalendarLogic {
     );
   }
 
-  static DateSpan predictedRange(DateTime predictedStart) {
+  static DateSpan predictedRange(
+    DateTime predictedStart, {
+    int windowDays = 0,
+  }) {
     final start = DateTimeUtils.dateOnly(predictedStart);
+    final periodEnd = DateTimeUtils.addDays(
+      start,
+      AppConstants.periodDuration - 1,
+    );
     return DateSpan(
-      start: start,
-      end: DateTimeUtils.addDays(start, AppConstants.periodDuration - 1),
+      start: DateTimeUtils.subtractDays(start, windowDays),
+      end: DateTimeUtils.addDays(periodEnd, windowDays),
     );
   }
 
   static DateSpan? spanFor(
     DateTime date, {
     required List<Cycle> cycles,
-    DateTime? predictedDate,
+    List<DateTime> predictedDates = const [],
+    int predictionWindowDays = 0,
   }) {
     final normalized = DateTimeUtils.dateOnly(date);
 
@@ -83,8 +91,11 @@ class CycleCalendarLogic {
       if (period.contains(normalized)) return period;
     }
 
-    if (predictedDate != null) {
-      final predicted = predictedRange(predictedDate);
+    for (final predictedDate in predictedDates) {
+      final predicted = predictedRange(
+        predictedDate,
+        windowDays: predictionWindowDays,
+      );
       if (predicted.contains(normalized)) return predicted;
     }
 
@@ -99,7 +110,8 @@ class CycleCalendarLogic {
   static CalendarDayKind kindFor(
     DateTime date, {
     required List<Cycle> cycles,
-    DateTime? predictedDate,
+    List<DateTime> predictedDates = const [],
+    int predictionWindowDays = 0,
   }) {
     final normalized = DateTimeUtils.dateOnly(date);
 
@@ -109,9 +121,13 @@ class CycleCalendarLogic {
       }
     }
 
-    if (predictedDate != null &&
-        predictedRange(predictedDate).contains(normalized)) {
-      return CalendarDayKind.predicted;
+    for (final predictedDate in predictedDates) {
+      if (predictedRange(
+        predictedDate,
+        windowDays: predictionWindowDays,
+      ).contains(normalized)) {
+        return CalendarDayKind.predicted;
+      }
     }
 
     for (final cycle in cycles) {

@@ -5,23 +5,28 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/date_time_utils.dart';
+import '../../core/utils/error_messages.dart';
 import '../../domain/entities/cycle.dart';
 import '../../l10n/app_localizations.dart';
 import '../theme/app_icons.dart';
 import '../theme/bento_tokens.dart';
 import '../viewmodels/cycle_viewmodel.dart';
+import 'app_toast.dart';
 import 'cycle_calendar_logic.dart';
+import 'period_range_picker.dart';
 
 class PredictionCardWidget extends ConsumerStatefulWidget {
   const PredictionCardWidget({
     super.key,
     this.predictedDate,
+    this.predictionWindowDays = 0,
     this.cycles = const [],
     this.averageCycleLength = AppConstants.defaultCycleLength,
     this.onCurrentCycleTap,
   });
 
   final DateTime? predictedDate;
+  final int predictionWindowDays;
   final List<Cycle> cycles;
   final int averageCycleLength;
   final VoidCallback? onCurrentCycleTap;
@@ -129,28 +134,48 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
       );
 
       await ref.read(cycleListProvider.notifier).addCycle(cycle);
-      ref.invalidate(predictedNextCycleDateProvider);
-      ref.invalidate(cycleStatisticsProvider);
 
       if (!mounted) return;
       setState(() => _loggedToday = true);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.periodLoggedSuccess),
-          backgroundColor: BentoTokens.success,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppToast.success(context, title: l10n.periodLoggedSuccess);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.errorMessage(e.toString())),
-            backgroundColor: BentoTokens.danger,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppToast.error(context, title: ErrorMessages.friendly(e, l10n));
+      }
+    } finally {
+      if (mounted) setState(() => _isLogging = false);
+    }
+  }
+
+  Future<void> _onEndPeriod(AppLocalizations l10n) async {
+    final cycle = CycleCalendarLogic.latestCycle(widget.cycles);
+    if (cycle == null || _isLogging) return;
+
+    HapticFeedback.lightImpact();
+    setState(() => _isLogging = true);
+
+    try {
+      final updated = Cycle(
+        id: cycle.id,
+        startDate: cycle.startDate,
+        cycleLength: cycle.cycleLength,
+        periodDuration: PeriodRangeLogic.durationThroughDay(
+          cycle.startDate,
+          DateTime.now(),
+        ),
+        notes: cycle.notes,
+        createdAt: cycle.createdAt,
+        updatedAt: DateTime.now(),
+      );
+
+      await ref.read(cycleListProvider.notifier).updateCycle(updated);
+
+      if (!mounted) return;
+      AppToast.success(context, title: l10n.periodEndedSuccess);
+    } catch (e) {
+      if (mounted) {
+        AppToast.error(context, title: ErrorMessages.friendly(e, l10n));
       }
     } finally {
       if (mounted) setState(() => _isLogging = false);
@@ -240,6 +265,18 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
+                        if (widget.predictionWindowDays > 0) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.predictionWindowDays(
+                              widget.predictionWindowDays,
+                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: BentoTokens.mutedText(context),
+                                ),
+                          ),
+                        ],
                         const SizedBox(height: BentoTokens.space8),
                         _PhaseBadge(
                           phase: phase,
@@ -255,7 +292,16 @@ class _PredictionCardWidgetState extends ConsumerState<PredictionCardWidget>
                   ),
                 ],
               ),
-              if (!_loggedToday) ...[
+              if (phase == CyclePhase.period && !_loggedToday) ...[
+                const SizedBox(height: BentoTokens.space12),
+                _LogPeriodButton(
+                  label: l10n.endPeriodNow,
+                  loading: _isLogging,
+                  scale: _buttonScale,
+                  icon: AppIcons.checkCircle,
+                  onPressed: () => _onEndPeriod(l10n),
+                ),
+              ] else if (!_loggedToday) ...[
                 const SizedBox(height: BentoTokens.space12),
                 _LogPeriodButton(
                   label: l10n.logPeriodToday,
@@ -471,15 +517,13 @@ class _PhaseBadge extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return switch (phase) {
       CyclePhase.period =>
-        isDark ? BentoTokens.primaryDark : BentoTokens.primary,
-      CyclePhase.follicular =>
-        isDark ? BentoTokens.accentDark : BentoTokens.accent,
-      CyclePhase.fertile =>
-        isDark
-            ? BentoTokens.secondaryDark
-            : Color.lerp(BentoTokens.secondary, BentoTokens.text, 0.35)!,
-      CyclePhase.luteal => BentoTokens.predicted,
-      null => isDark ? BentoTokens.accentDark : BentoTokens.accent,
+        isDark ? BentoTokens.primaryDark : BentoTokens.primaryButton,
+      CyclePhase.follicular => BentoTokens.statBlue(context),
+      CyclePhase.fertile => isDark
+          ? BentoTokens.statSuccessForeground(context)
+          : BentoTokens.success,
+      CyclePhase.luteal => BentoTokens.statPurple(context),
+      null => BentoTokens.statBlue(context),
     };
   }
 
@@ -536,12 +580,14 @@ class _LogPeriodButton extends StatelessWidget {
     required this.loading,
     required this.scale,
     required this.onPressed,
+    this.icon = AppIcons.add,
   });
 
   final String label;
   final bool loading;
   final double scale;
   final VoidCallback onPressed;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -569,7 +615,7 @@ class _LogPeriodButton extends StatelessWidget {
                     color: Colors.white,
                   ),
                 )
-              : const Icon(AppIcons.add, size: 16),
+              : Icon(icon, size: 16),
           label: Text(
             label,
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),

@@ -47,11 +47,7 @@ class RangeDayStyle {
   static BorderRadius radiusForCell({
     required RangeDayRole role,
     required int columnIndex,
-    bool isToday = false,
   }) {
-    if (role == RangeDayRole.none && isToday) {
-      return BorderRadius.circular(BentoTokens.radiusMd);
-    }
     return borderRadiusForRole(role, columnIndex);
   }
 
